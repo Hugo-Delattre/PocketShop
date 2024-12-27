@@ -18,23 +18,41 @@ import {
 } from "react-native";
 import { Audio } from "expo-av";
 import { Card } from "@rneui/base";
+import useProductApi from "@/hooks/api/product";
+import { useRouter, useLocalSearchParams } from "expo-router";
 
-export default function Product({ product }: { product: Product }) {
+export default function ProductScreen() {
+  const router = useRouter();
+  const params = useLocalSearchParams();
+  const { getProduct, loading } = useProductApi();
+  const [product, setProduct] = useState<Product | null>(null);
   const [bipSound, setBipSound] = useState<Audio.Sound | null>(null);
+
+  // from string | string[] to string
+  const productId = Array.isArray(params?.productId)
+    ? params.productId[0]
+    : params?.productId;
+
+  useEffect(() => {
+    getProduct(productId).then(setProduct);
+  }, [productId]);
+
+  if (loading || !product) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.message}>Loading...</Text>
+      </SafeAreaView>
+    );
+  }
 
   // FOR TESTING PURPOSE
   const productDataTest: ProductInShop = {
-    ...product,
     available: true,
     availableQuantity: Math.trunc(Math.random() * 100),
     price: 2.99,
+    ...product,
   };
   //END TEST
-
-  const [productData, setProductData] = useState<ProductInShop | null>(
-    productDataTest
-  );
-
   function addToCart(product: Product) {
     console.log(`Adding product ${product.name} to cart`);
   }
@@ -60,11 +78,11 @@ export default function Product({ product }: { product: Product }) {
         </Text>
         <Card.Divider />
         <Text style={{ fontSize: 30 }}>
-          {productData?.price} €
+          {productDataTest?.price} €
           <Text style={{ fontSize: 15 }}>
             {" ("}
-            {productData?.available
-              ? `${productData?.availableQuantity} left in stock`
+            {productDataTest?.available
+              ? `${productDataTest?.availableQuantity} left in stock`
               : "Not available"}
             {")"}
           </Text>

@@ -6,9 +6,8 @@ import {
   Camera,
   BarcodeScanningResult,
 } from "expo-camera";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@rneui/themed";
-import { NavigationProp, useNavigation } from "@react-navigation/native";
 import {
   StyleSheet,
   Text,
@@ -16,33 +15,24 @@ import {
   View,
   Image,
   SafeAreaView,
+  AppState,
 } from "react-native";
 import { Audio } from "expo-av";
-import { Card } from "@rneui/base";
+import useProductApi from "@/hooks/api/product";
+import { router, usePathname, useRouter, useSegments } from "expo-router";
 
-export type RootStackParamList = {
-  Product: { product: Product };
-};
 export default function App() {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [facing, setFacing] = useState<CameraType>("back");
-  const [currentlyScanning, setCurrentlyScanning] = useState(false);
   const [permission, requestPermission] = useCameraPermissions();
-  const [scannedData, setScannedData] = useState<Product | null>(null);
   const [bipSound, setBipSound] = useState<Audio.Sound | null>(null);
-
-  // FOR TESTING PURPOSE
-  const productDataTest: ProductInShop = {
-    product: scannedData,
-    available: true,
-    availableQuantity: Math.trunc(Math.random() * 100),
-    price: 2.99,
-  };
-  //END TEST
-
-  const [productData, setProductData] = useState<ProductInShop | null>(
-    productDataTest
-  );
+  const router = useRouter();
+  const [isFocused, setIsFocused] = useState(true);
+  const pathname = usePathname();
+  useEffect(() => {
+    setIsFocused(pathname === "/");
+    console.log("Pathname", pathname);
+    console.log("isFocused", isFocused);
+  }, [pathname]);
 
   useEffect(() => {
     async function loadSound() {
@@ -83,12 +73,10 @@ export default function App() {
 
   async function onBarCodeScanned(data: string) {
     CameraView.dismissScanner();
-    console.log("Scanned data:", data);
-    setCurrentlyScanning(true);
-    const productData = await getProduct(data);
-    setScannedData(productData.product);
-    console.log("Scanned data:", scannedData);
-    navigation.navigate("Product", { product: productData });
+    if (!data) {
+      return;
+    }
+    router.push({ pathname: "/product", params: { productId: data } });
   }
 
   return (
@@ -96,7 +84,8 @@ export default function App() {
       <CameraView
         style={styles.camera}
         facing={facing}
-        onBarcodeScanned={currentlyScanning ? undefined : handleBarcodeScanned}
+        onBarcodeScanned={handleBarcodeScanned}
+        active={isFocused}
       >
         <View style={styles.buttonContainer}></View>
       </CameraView>
