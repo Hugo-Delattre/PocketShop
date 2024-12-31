@@ -20,7 +20,11 @@ import { Audio } from "expo-av";
 import { Card } from "@rneui/base";
 import useProductApi from "@/hooks/api/product";
 import { useRouter, useLocalSearchParams } from "expo-router";
-
+import { CardDivider } from "@rneui/base/dist/Card/Card.Divider";
+import ParallaxScrollView from "@/components/ParallaxScrollView";
+import { Ionicons } from "@expo/vector-icons";
+import { ScrollView } from "react-native-gesture-handler";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 export default function ProductScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
@@ -34,7 +38,18 @@ export default function ProductScreen() {
     : params?.productId;
 
   useEffect(() => {
-    getProduct(productId).then(setProduct);
+    console.log("Product ID", productId);
+    const fetchProduct = async () => {
+      const productData = await getProduct(productId);
+      console.log("Product Data", productData);
+
+      if (productData) {
+        //TODO: remove this .product after fixing the API
+        setProduct(productData.product);
+      }
+    };
+
+    fetchProduct();
   }, [productId]);
 
   if (loading || !product) {
@@ -50,15 +65,40 @@ export default function ProductScreen() {
     available: true,
     availableQuantity: Math.trunc(Math.random() * 100),
     price: 2.99,
+    testNutriments: {
+      "energy-kcal": 160,
+      fat: 10,
+      carbohydrates: 20,
+      fiber: 5,
+      proteins: 5,
+      salt: 0.1,
+      sugars: 10,
+      sodium: 0.1,
+    },
     ...product,
   };
+
   //END TEST
   function addToCart(product: Product) {
     console.log(`Adding product ${product.name} to cart`);
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView>
+      <View>
+        <Text numberOfLines={2} ellipsizeMode="clip" style={styles.screenTitle}>
+          {product?.product_name_fr !== ""
+            ? product.product_name_fr
+            : product?.name}
+          {" - "}
+          {product?.brands}
+        </Text>
+      </View>
+
+      <Image
+        source={require("../../assets/images/background.png")}
+        style={styles.backgroundImage}
+      />
       <View style={styles.productCard}>
         <Image
           source={{
@@ -67,17 +107,8 @@ export default function ProductScreen() {
               : "https://www.granitz.fr/images/image-not-found.jpg",
           }}
           style={styles.productImage}
-          resizeMode="contain"
         />
-        <Text numberOfLines={2} ellipsizeMode="clip" style={{ fontSize: 22 }}>
-          {product?.product_name_fr !== ""
-            ? product.product_name_fr
-            : product?.name}
-          {", "}
-          <Text style={{ fontWeight: "bold" }}>{product?.brands}</Text>
-        </Text>
-        <Card.Divider />
-        <Text style={{ fontSize: 30 }}>
+        {/* <Text style={{ fontSize: 30 }}>
           {productDataTest?.price} €
           <Text style={{ fontSize: 15 }}>
             {" ("}
@@ -86,9 +117,9 @@ export default function ProductScreen() {
               : "Not available"}
             {")"}
           </Text>
-        </Text>
+        </Text> */}
       </View>
-      <View style={styles.buttonsPart}>
+      {/* <View>
         <Button
           color={"primary"}
           radius={15}
@@ -97,56 +128,104 @@ export default function ProductScreen() {
             addToCart(product);
           }}
         />
+      </View> */}
+
+      <View style={styles.nutritionFacts}>
+        <Card>
+          <Card.Title>Nutrition facts</Card.Title>
+          <View>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+              }}
+            >
+              <Text>Calories for 100g</Text>
+              <Text style={{ fontWeight: "bold" }}>160</Text>
+            </View>
+          </View>
+          <CardDivider />
+          {productDataTest?.testNutriments &&
+            Object.entries(productDataTest.testNutriments).map(
+              ([key, value]) => (
+                <View
+                  key={key}
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text>{key}</Text>
+                  <Text style={{ fontWeight: "bold" }}>{value}</Text>
+                </View>
+              )
+            )}
+        </Card>
+      </View>
+      <View style={styles.addToCart}>
+        <Button
+          color={"#0B132B"}
+          title="Add to Cart"
+          onPress={() => {
+            addToCart(product);
+          }}
+          radius={5}
+        >
+          <Text style={styles.price}>{productDataTest.price} €</Text>
+          <FontAwesome name="cart-arrow-down" size={20} color="white" />
+        </Button>
       </View>
     </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-  },
-  productImage: {
-    aspectRatio: 3 / 4,
-    width: "50%",
-    height: "66%",
-    borderRadius: 30,
-    margin: 10,
-  },
   productCard: {
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    margin: 10,
-    padding: 10,
+    position: "absolute",
+    left: 87,
+    top: 214,
+  },
+  productImage: { width: 218, height: 218 },
+  screenTitle: {
+    position: "absolute",
+    width: 300,
+    height: 28,
+    left: 46,
+    top: 100,
+    fontFamily: "Crimson Text",
+    fontStyle: "normal",
+    fontWeight: 400,
+    fontSize: 28,
+    lineHeight: 28,
+    textAlign: "center",
+  },
+  nutritionFacts: {
+    padding: 24,
+    gap: 10,
+    position: "absolute",
+    width: 300,
+    height: 282,
+    left: 46,
+    top: 400,
   },
   message: {
-    padding: 5,
-  },
-  camera: {
-    flex: 1,
-  },
-  buttonContainer: {
-    flex: 1,
-    flexDirection: "row",
-    backgroundColor: "transparent",
-    margin: 64,
-  },
-  button: {
-    flex: 1,
-    alignSelf: "flex-end",
-    alignItems: "center",
-  },
-  text: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: "bold",
+  },
+  addToCart: {
+    position: "absolute",
+    width: 135,
+    height: 40,
+    left: 245,
+    top: 700,
+  },
+  price: {
+    fontSize: 18,
     color: "white",
+    marginRight: 10,
   },
-  productName: {
-    fontWeight: "bold",
-  },
-  buttonsPart: {
-    flexDirection: "row",
-    justifyContent: "space-around",
+  backgroundImage: {
+    resizeMode: "cover",
+    width: "100%",
+    height: "100%",
   },
 });

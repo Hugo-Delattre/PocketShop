@@ -1,3 +1,14 @@
+export interface Nutriments {
+  "energy-kcal": number;
+  fat: number;
+  fiber: number;
+  proteins: number;
+  salt: number;
+  sugars: number;
+  carbohydrates: number;
+  sodium: number;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -11,10 +22,12 @@ export interface Product {
   allergens: string[];
   image_url: string;
   quantity: string;
+  // nutriments: Nutriments;
 }
 
 export interface ProductInShop extends Product {
   available: boolean;
   availableQuantity: number;
   price: number;
+  testNutriments: Nutriments;
 }

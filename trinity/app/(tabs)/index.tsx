@@ -30,8 +30,6 @@ export default function App() {
   const pathname = usePathname();
   useEffect(() => {
     setIsFocused(pathname === "/");
-    console.log("Pathname", pathname);
-    console.log("isFocused", isFocused);
   }, [pathname]);
 
   useEffect(() => {
@@ -52,20 +50,16 @@ export default function App() {
     // Camera permissions are not granted yet.
     return (
       <SafeAreaView style={styles.container}>
-        <Text style={styles.message}>
-          We need your permission to show the camera
-        </Text>
+        <Text>We need your permission to show the camera</Text>
         <Button onPress={requestPermission} title="grant permission" />
       </SafeAreaView>
     );
   }
   const handleBarcodeScanned = async (result: BarcodeScanningResult) => {
-    console.log("Scanning...");
     await bip();
     await onBarCodeScanned(result.data);
   };
   async function bip() {
-    console.log("Playing Sound");
     if (bipSound) {
       await bipSound.replayAsync();
     }
@@ -81,41 +75,45 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <View>
+        <Text style={styles.screnTitle}>Scan a product</Text>
+      </View>
+
+      <Image
+        source={require("../../assets/images/background.png")}
+        style={styles.backgroundImage}
+      />
+
       <CameraView
         style={styles.camera}
         facing={facing}
         onBarcodeScanned={handleBarcodeScanned}
         active={isFocused}
-      >
-        <View style={styles.buttonContainer}></View>
-      </CameraView>
+        zoom={0.18}
+      ></CameraView>
     </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: "center",
+    position: "relative",
   },
-  productImage: {
-    aspectRatio: 3 / 4,
-    width: "50%",
-    height: "66%",
-    borderRadius: 30,
-    margin: 10,
-  },
-  productCard: {
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    margin: 10,
-    padding: 10,
-  },
-  message: {
-    padding: 5,
+  backgroundImage: {
+    resizeMode: "cover",
+    width: "100%",
+    height: "100%",
   },
   camera: {
-    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 0,
+    position: "absolute",
+    width: 303,
+    height: 450,
+    left: 45,
+    top: 250,
   },
   buttonContainer: {
     flex: 1,
@@ -139,5 +137,19 @@ const styles = StyleSheet.create({
   buttonsPart: {
     flexDirection: "row",
     justifyContent: "space-around",
+  },
+  screnTitle: {
+    position: "absolute",
+    width: 303,
+    height: 28,
+    left: 45,
+    top: 125,
+    fontFamily: "Crimson Text",
+    fontStyle: "normal",
+    fontWeight: "400",
+    fontSize: 28,
+    lineHeight: 28,
+    textAlign: "center",
+    color: "#000000",
   },
 });
