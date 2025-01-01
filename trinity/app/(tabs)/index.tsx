@@ -75,45 +75,31 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View>
-        <Text style={styles.screnTitle}>Scan a product</Text>
+      <View style={styles.cameraDiv}>
+        <CameraView
+          style={styles.camera}
+          facing={facing}
+          onBarcodeScanned={handleBarcodeScanned}
+          active={isFocused}
+        ></CameraView>
       </View>
-
-      <Image
-        source={require("../../assets/images/background.png")}
-        style={styles.backgroundImage}
-      />
-
-      <CameraView
-        style={styles.camera}
-        facing={facing}
-        onBarcodeScanned={handleBarcodeScanned}
-        active={isFocused}
-        zoom={0.18}
-      ></CameraView>
     </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({
   container: {
-    position: "relative",
-  },
-  backgroundImage: {
-    resizeMode: "cover",
-    width: "100%",
-    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
   },
   camera: {
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    padding: 0,
-    position: "absolute",
-    width: 303,
-    height: 450,
-    left: 45,
-    top: 250,
+    width: 300,
+    height: 500,
+    margin: 5,
   },
   buttonContainer: {
     flex: 1,
@@ -138,12 +124,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
   },
+  cameraDiv: { marginTop: 100, borderRadius: 10, backgroundColor: "#0B132B" },
   screnTitle: {
     position: "absolute",
     width: 303,
     height: 28,
     left: 45,
-    top: 125,
+    top: 100,
     fontFamily: "Crimson Text",
     fontStyle: "normal",
     fontWeight: "400",

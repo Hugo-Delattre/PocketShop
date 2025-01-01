@@ -15,6 +15,7 @@ import {
   View,
   Image,
   SafeAreaView,
+  ImageBackground,
 } from "react-native";
 import { Audio } from "expo-av";
 import { Card } from "@rneui/base";
@@ -23,8 +24,8 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import { CardDivider } from "@rneui/base/dist/Card/Card.Divider";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { Ionicons } from "@expo/vector-icons";
-import { ScrollView } from "react-native-gesture-handler";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { ScrollView } from "react-native";
 export default function ProductScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
@@ -85,7 +86,7 @@ export default function ProductScreen() {
 
   return (
     <SafeAreaView>
-      <View>
+      <View style={styles.container}>
         <Text numberOfLines={2} ellipsizeMode="clip" style={styles.screenTitle}>
           {product?.product_name_fr !== ""
             ? product.product_name_fr
@@ -94,11 +95,6 @@ export default function ProductScreen() {
           {product?.brands}
         </Text>
       </View>
-
-      <Image
-        source={require("../../assets/images/background.png")}
-        style={styles.backgroundImage}
-      />
       <View style={styles.productCard}>
         <Image
           source={{
@@ -145,21 +141,24 @@ export default function ProductScreen() {
             </View>
           </View>
           <CardDivider />
-          {productDataTest?.testNutriments &&
-            Object.entries(productDataTest.testNutriments).map(
-              ([key, value]) => (
-                <View
-                  key={key}
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Text>{key}</Text>
-                  <Text style={{ fontWeight: "bold" }}>{value}</Text>
-                </View>
-              )
-            )}
+
+          <ScrollView style={{ height: 125, padding: 10 }}>
+            {productDataTest?.testNutriments &&
+              Object.entries(productDataTest.testNutriments).map(
+                ([key, value]) => (
+                  <View
+                    key={key}
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Text>{key}</Text>
+                    <Text style={{ fontWeight: "bold" }}>{value}</Text>
+                  </View>
+                )
+              )}
+          </ScrollView>
         </Card>
       </View>
       <View style={styles.addToCart}>
@@ -179,44 +178,47 @@ export default function ProductScreen() {
   );
 }
 const styles = StyleSheet.create({
-  productCard: {
-    position: "absolute",
-    left: 87,
-    top: 214,
+  container: {
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
   },
-  productImage: { width: 218, height: 218 },
+  productCard: {
+    padding: 10,
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+  productImage: {
+    width: 250,
+    height: 250,
+    borderRadius: 10,
+    alignContent: "center",
+    justifyContent: "center",
+  },
   screenTitle: {
-    position: "absolute",
-    width: 300,
-    height: 28,
-    left: 46,
-    top: 100,
     fontFamily: "Crimson Text",
     fontStyle: "normal",
     fontWeight: 400,
-    fontSize: 28,
-    lineHeight: 28,
+    padding: 10,
+    fontSize: 22,
     textAlign: "center",
   },
   nutritionFacts: {
-    padding: 24,
-    gap: 10,
-    position: "absolute",
-    width: 300,
-    height: 282,
-    left: 46,
-    top: 400,
+    margin: 24,
+    borderRadius: 10,
   },
   message: {
     fontSize: 18,
     fontWeight: "bold",
   },
   addToCart: {
-    position: "absolute",
-    width: 135,
     height: 40,
-    left: 245,
-    top: 700,
+    marginRight: 39,
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    borderRadius: 10,
   },
   price: {
     fontSize: 18,

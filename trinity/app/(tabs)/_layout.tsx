@@ -1,6 +1,6 @@
 import { Tabs } from "expo-router";
 import React from "react";
-import { StyleSheet } from "react-native";
+import { ImageBackground, StyleSheet } from "react-native";
 
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { Colors } from "@/constants/Colors";
@@ -16,13 +16,14 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: "#0B132B",
         },
-        headerShown: false,
+        headerShown: true,
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: "Scan",
+          title: "Scan your product",
+
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
               name={focused ? "barcode" : "barcode-outline"}
@@ -46,7 +47,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="cart"
         options={{
-          title: "Explore",
+          title: "Your cart",
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
               name={focused ? "cart" : "cart-outline"}
