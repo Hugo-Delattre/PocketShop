@@ -39,14 +39,13 @@ export default function ProductScreen() {
     : params?.productId;
 
   useEffect(() => {
-    console.log("Product ID", productId);
     const fetchProduct = async () => {
       const productData = await getProduct(productId);
-      console.log("Product Data", productData);
+      // console.log("Product Data", productData);
 
       if (productData) {
         //TODO: remove this .product after fixing the API
-        setProduct(productData.product);
+        setProduct(productData);
       }
     };
 

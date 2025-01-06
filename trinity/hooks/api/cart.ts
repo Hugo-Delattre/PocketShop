@@ -1,7 +1,7 @@
 import { Product } from "@/constants/interface/Product";
 import { useState } from "react";
 
-const BASE_URL = "http://localhost:3000"; //TODO:replace by env variable
+const BASE_URL = process.env.EXPO_PUBLIC_API_URL + "/cart";
 
 const useCartApi = () => {
   const [data, setData] = useState<Product | null>(null);
