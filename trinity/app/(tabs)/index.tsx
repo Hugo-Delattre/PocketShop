@@ -1,7 +1,12 @@
 import { Product, ProductInShop } from "@/constants/interface/Product";
-import { fetchByCode } from "@/hooks/api/test";
-import { CameraView, CameraType, useCameraPermissions, Camera, BarcodeScanningResult } from "expo-camera";
-import { useEffect, useState } from "react";
+import {
+  CameraView,
+  CameraType,
+  useCameraPermissions,
+  Camera,
+  BarcodeScanningResult,
+} from "expo-camera";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@rneui/themed";
 import {
   StyleSheet,
@@ -10,28 +15,24 @@ import {
   View,
   Image,
   SafeAreaView,
+  AppState,
 } from "react-native";
 import { Audio } from "expo-av";
-import { Card } from "@rneui/base";
+import useProductApi from "@/hooks/api/product";
+import { router, usePathname, useRouter, useSegments } from "expo-router";
+
 export default function App() {
   const [facing, setFacing] = useState<CameraType>("back");
-  const [currentlyScanning, setCurrentlyScanning] = useState(false);
   const [permission, requestPermission] = useCameraPermissions();
-  const [scannedData, setScannedData] = useState<Product | null>(null);
   const [bipSound, setBipSound] = useState<Audio.Sound | null>(null);
-
-  // FOR TESTING PURPOSE
-  const productDataTest: ProductInShop = {
-    product: scannedData,
-    available: true,
-    avaibleQuantity: Math.trunc(Math.random() * 100),
-    price: 2.99,
-  };
-  //END TEST
-
-  const [productData, setProductData] = useState<ProductInShop | null>(
-    productDataTest
-  );
+  const router = useRouter();
+  const [isFocused, setIsFocused] = useState(true);
+  const pathname = usePathname();
+  useEffect(() => {
+    setIsFocused(pathname === "/");
+    console.log("Pathname", pathname);
+    console.log("isFocused", isFocused);
+  }, [pathname]);
 
   useEffect(() => {
     async function loadSound() {
@@ -58,12 +59,11 @@ export default function App() {
       </SafeAreaView>
     );
   }
-  const handleBarcodeScanned = async (result : BarcodeScanningResult ) => {
-
+  const handleBarcodeScanned = async (result: BarcodeScanningResult) => {
     console.log("Scanning...");
-      await bip();
-      await onBarCodeScanned(result.data)
-    };
+    await bip();
+    await onBarCodeScanned(result.data);
+  };
   async function bip() {
     console.log("Playing Sound");
     if (bipSound) {
@@ -71,89 +71,27 @@ export default function App() {
     }
   }
 
-  async function onBarCodeScanned(data:string) {
+  async function onBarCodeScanned(data: string) {
     CameraView.dismissScanner();
-    console.log("Scanned data:", data);
-    setCurrentlyScanning(true);
-    const productData = await fetchByCode(data);
-    setScannedData(productData.product);
-    console.log("Scanned data:", scannedData);
+    if (!data) {
+      return;
+    }
+    router.push({ pathname: "/product", params: { productId: data } });
   }
 
-  if (currentlyScanning && scannedData) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.productCard}>
-          <Image
-            source={{
-              uri: scannedData.image_url
-                ? scannedData.image_url
-                : "https://www.granitz.fr/images/image-not-found.jpg",
-            }}
-            style={styles.productImage}
-            resizeMode="contain"
-          />
-          <Text numberOfLines={2} ellipsizeMode="clip" style={{ fontSize: 22 }}>
-            {scannedData.product_name_fr !== ""
-              ? scannedData.product_name_fr
-              : scannedData.name}
-            {", "}
-            <Text style={{ fontWeight: "bold" }}>{scannedData.brands}</Text>
-          </Text>
-          <Card.Divider />
-          {/* <Text>{scannedData.quantity}</Text> */}
-          {/* <Text style={{ fontSize: 10 }}>
-            {"["}
-            {scannedData.id}
-            {"]"}
-          </Text> */}
-          {/* <Text>Ingrédients : {scannedData.ingredients_text}</Text> */}
-          {/* <Text>{scannedData.categories}</Text> */}
-          {/* <Text>{scannedData.allergens}</Text> */}
-
-          <Text style={{ fontSize: 30 }}>
-            {productData?.price} €
-            <Text style={{ fontSize: 15 }}>
-              {" ("}
-              {productData?.available
-                ? `${productData?.avaibleQuantity} left in stock`
-                : "Not vailable"}
-              {")"}
-            </Text>
-          </Text>
-        </View>
-        <View style={styles.buttonsPart}>
-          <Button
-            type="outline"
-            title="Back to scan"
-            radius={15}
-            onPress={() => setCurrentlyScanning(false)}
-          ></Button>
-          <Button
-            color={"primary"}
-            radius={15}
-            title="Add to Cart"
-            onPress={() => {
-              console.log(
-                "Product added to cart:",
-                scannedData.generic_name_fr
-              );
-            }}
-          />
-        </View>
-      </SafeAreaView>
-    );
-  }
   return (
     <SafeAreaView style={styles.container}>
-      <CameraView style={styles.camera} facing={facing} onBarcodeScanned={currentlyScanning ? undefined : handleBarcodeScanned}>
-        <View style={styles.buttonContainer}>
-        </View>
+      <CameraView
+        style={styles.camera}
+        facing={facing}
+        onBarcodeScanned={handleBarcodeScanned}
+        active={isFocused}
+      >
+        <View style={styles.buttonContainer}></View>
       </CameraView>
     </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
