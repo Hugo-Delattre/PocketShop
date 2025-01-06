@@ -30,8 +30,6 @@ export default function App() {
   const pathname = usePathname();
   useEffect(() => {
     setIsFocused(pathname === "/");
-    console.log("Pathname", pathname);
-    console.log("isFocused", isFocused);
   }, [pathname]);
 
   useEffect(() => {
@@ -52,20 +50,16 @@ export default function App() {
     // Camera permissions are not granted yet.
     return (
       <SafeAreaView style={styles.container}>
-        <Text style={styles.message}>
-          We need your permission to show the camera
-        </Text>
+        <Text>We need your permission to show the camera</Text>
         <Button onPress={requestPermission} title="grant permission" />
       </SafeAreaView>
     );
   }
   const handleBarcodeScanned = async (result: BarcodeScanningResult) => {
-    console.log("Scanning...");
     await bip();
     await onBarCodeScanned(result.data);
   };
   async function bip() {
-    console.log("Playing Sound");
     if (bipSound) {
       await bipSound.replayAsync();
     }
@@ -81,41 +75,31 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <CameraView
-        style={styles.camera}
-        facing={facing}
-        onBarcodeScanned={handleBarcodeScanned}
-        active={isFocused}
-      >
-        <View style={styles.buttonContainer}></View>
-      </CameraView>
+      <View style={styles.cameraDiv}>
+        <CameraView
+          style={styles.camera}
+          facing={facing}
+          onBarcodeScanned={handleBarcodeScanned}
+          active={isFocused}
+        ></CameraView>
+      </View>
     </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: "center",
-  },
-  productImage: {
-    aspectRatio: 3 / 4,
-    width: "50%",
-    height: "66%",
-    borderRadius: 30,
-    margin: 10,
-  },
-  productCard: {
-    flexDirection: "column",
     alignItems: "center",
-    justifyContent: "center",
-    margin: 10,
-    padding: 10,
-  },
-  message: {
-    padding: 5,
+    flexDirection: "row",
   },
   camera: {
-    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    width: 300,
+    height: 500,
+    margin: 5,
   },
   buttonContainer: {
     flex: 1,
@@ -139,5 +123,20 @@ const styles = StyleSheet.create({
   buttonsPart: {
     flexDirection: "row",
     justifyContent: "space-around",
+  },
+  cameraDiv: { marginTop: 100, borderRadius: 10, backgroundColor: "#0B132B" },
+  screnTitle: {
+    position: "absolute",
+    width: 303,
+    height: 28,
+    left: 45,
+    top: 100,
+    fontFamily: "Crimson Text",
+    fontStyle: "normal",
+    fontWeight: "400",
+    fontSize: 28,
+    lineHeight: 28,
+    textAlign: "center",
+    color: "#000000",
   },
 });

@@ -1,5 +1,6 @@
 import { Tabs } from "expo-router";
 import React from "react";
+import { ImageBackground, StyleSheet } from "react-native";
 
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { Colors } from "@/constants/Colors";
@@ -12,16 +13,20 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
-        headerShown: false,
+        tabBarStyle: {
+          backgroundColor: "#0B132B",
+        },
+        headerShown: true,
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: "Scan",
+          title: "Scan your product",
+
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
-              name={focused ? "camera" : "camera-outline"}
+              name={focused ? "barcode" : "barcode-outline"}
               color={color}
             />
           ),
@@ -33,7 +38,7 @@ export default function TabLayout() {
           title: "Product",
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
-              name={focused ? "airplane" : "airplane-outline"}
+              name={focused ? "cube" : "cube-outline"}
               color={color}
             />
           ),
@@ -42,7 +47,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="cart"
         options={{
-          title: "Explore",
+          title: "Your cart",
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
               name={focused ? "cart" : "cart-outline"}
@@ -54,3 +59,8 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "red",
+  },
+});

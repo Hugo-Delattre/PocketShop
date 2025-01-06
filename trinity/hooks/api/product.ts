@@ -42,7 +42,9 @@ const useProductApi = () => {
         return null;
       }
       const result = await response.json();
-      setData(result);
+      const truncatedResult = JSON.stringify(result.product).substring(0, 600);
+      console.log("result", truncatedResult);
+      setData(result.product);
       return result;
     } catch (err) {
       setError(err as Error);
