@@ -11,7 +11,7 @@ import { ThemedText } from "../ThemedText";
 import { CartInfo } from "@/constants/interface/Cart";
 
 const ProductCard = ({ product: cartInfo }: { product: CartInfo }) => {
-  console.log("product", cartInfo.product.name);
+  // console.log("product", cartInfo.product.name);
   return (
     <SafeAreaView>
       <View key={cartInfo.product.id} style={styles.productCard}>

@@ -1,4 +1,4 @@
-import { Product, ProductInShop } from "@/constants/interface/Product";
+import { Product } from "@/constants/interface/Product";
 import { useState } from "react";
 import getJwt from "@/utils/utils";
 import { CartResponseDao } from "@/constants/interface/Cart";
@@ -6,7 +6,6 @@ const BASE_URL = process.env.EXPO_PUBLIC_API_URL + "/carts";
 
 type AddPayload = {
   productId: string;
-  orderId: string | null | undefined;
   shopId: string;
   userId: string;
 };
@@ -26,6 +25,7 @@ const useCartApi = () => {
     setLoading(true);
     const jwtToken = await getJwt();
     setJwtToken(jwtToken);
+    // console.log("COUCOU", jwtToken);
     try {
       const response = await fetch(`${BASE_URL}/add`, {
         method: "PATCH",
@@ -35,6 +35,7 @@ const useCartApi = () => {
         },
         body: JSON.stringify(body),
       });
+      // console.log("response", response);
       return response.ok;
     } catch (err) {
       setError(err as Error);

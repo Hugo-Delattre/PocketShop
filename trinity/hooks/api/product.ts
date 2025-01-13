@@ -34,7 +34,7 @@ const useProductApi = () => {
     setJwtToken(jwtToken);
     setLoading(true);
 
-    console.log("BASE_URL", BASE_URL);
+    // console.log("BASE_URL", BASE_URL);
     try {
       const response = await fetch(`${BASE_URL}/${id}`, {
         method: "GET",
@@ -43,9 +43,9 @@ const useProductApi = () => {
           Authorization: "Bearer " + jwtToken,
         },
       });
-      console.log("jwt in request", jwtToken);
+      // console.log("jwt in request", jwtToken);
       if (!response.ok) {
-        console.log("response", response);
+        // console.log("response", response);
         throw new Error("Product not found");
       }
       const result = await response.json();
@@ -54,7 +54,7 @@ const useProductApi = () => {
       return result;
     } catch (err) {
       setError(err as Error);
-      console.log("error here :", err);
+      // console.log("error here :", err);
       throw err;
     } finally {
       setLoading(false);

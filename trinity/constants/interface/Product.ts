@@ -11,6 +11,8 @@ export interface Nutriments {
 
 export interface Product {
   id: string;
+
+  code: string;
   name: string;
   brands: string;
   product_name_fr: string;
