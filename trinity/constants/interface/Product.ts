@@ -22,12 +22,8 @@ export interface Product {
   allergens: string[];
   image_url: string;
   quantity: string;
-  // nutriments: Nutriments;
-}
-
-export interface ProductInShop extends Product {
+  nutriments: Nutriments;
   available: boolean;
   availableQuantity: number;
   price: number;
-  testNutriments: Nutriments;
 }

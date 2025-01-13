@@ -80,7 +80,7 @@ export default function ProductScreen() {
 
   //END TEST
   function addToCart(product: Product) {
-    console.log(`Adding product ${product.name} to cart`);
+    // console.log(`Adding product ${product.name} to cart`);
   }
 
   return (

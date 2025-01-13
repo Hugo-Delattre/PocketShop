@@ -33,7 +33,6 @@ const useProductApi = () => {
     const jwtToken = await getJwt();
     setJwtToken(jwtToken);
     setLoading(true);
-    // const BASE_URL = `https://world.openfoodfacts.org/api/v2/product/${id}.json`;
 
     console.log("BASE_URL", BASE_URL);
     try {
