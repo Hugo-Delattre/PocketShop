@@ -1,0 +1,96 @@
+stages:
+  - lint
+  - test
+  - build
+  - deploy
+
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: "/certs"
+  DOCKER_HOST: "unix:///var/run/docker.sock"
+
+services:
+  - name: docker:24.0.5-dind
+    alias: docker
+
+lint:
+  stage: lint
+  image: node:23
+  before_script:
+    - curl -Ls https://cli.doppler.com/install.sh | sh
+    - echo "DOPPLER_TOKEN=$DOPPLER_TOKEN"
+    - doppler configure --token $DOPPLER_TOKEN --scope t-dev-702
+    - doppler run --config dev -- npm ci
+  script:
+    - npm run lint
+  only:
+    - merge_requests
+    - main
+  tags:
+    - docker
+
+test:
+  stage: test
+  variables:
+    POSTGRES_USER: $PG_USER
+    POSTGRES_PASSWORD: $PG_PASSWORD
+    POSTGRES_DB: $PG_DB
+    DOCKER_HOST: "unix:///runner/services/docker/docker.sock"
+  services:
+    - docker:24.0.5-dind
+    - name: postgres:16
+      alias: db
+  image: docker:24.0.5
+  before_script:
+    - docker info
+    - apk add --no-cache curl bash gnupg docker-compose
+    - echo "Installation de Node.js et npm"
+    - apk add --no-cache nodejs npm
+    - echo "Installation de Doppler"
+    - curl -Ls https://cli.doppler.com/install.sh | sh
+    - doppler configure --token $DOPPLER_TOKEN --scope t-dev-702
+    - echo "Démarrage de la base de données avec Docker Compose"
+    - doppler run --config dev -- docker-compose up -d db
+  script:
+    - doppler run --config dev -- npm ci
+    - doppler run --config dev -- npm run test
+  after_script:
+    - docker-compose down -v
+  only:
+    - merge_requests
+    - main
+  tags:
+    - docker
+
+build:
+  stage: build
+  image: node:23
+  before_script:
+    - doppler run -- npm ci
+  script:
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+  only:
+    - main
+  tags:
+    - docker
+
+deploy:
+  stage: deploy
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
+  before_script:
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+    - apk add --no-cache docker-compose  # Si nécessaire
+    - doppler run -- docker-compose build app
+  script:
+    - doppler run -- docker-compose up -d
+  after_script:
+    - docker-compose down
+  only:
+    - main
+  tags:
+    - docker
