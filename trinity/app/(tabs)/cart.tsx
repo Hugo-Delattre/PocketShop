@@ -4,133 +4,53 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Image,
   SafeAreaView,
-  ImageBackground,
 } from "react-native";
-import { CameraView } from "expo-camera";
-import { Collapsible } from "@/components/Collapsible";
-import { ExternalLink } from "@/components/ExternalLink";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
-import { Product, ProductInShop } from "@/constants/interface/Product";
-import React, { useState, useEffect } from "react";
+import { Product } from "@/constants/interface/Product";
+import React, { useState, useEffect, Fragment } from "react";
 import useCartApi from "@/hooks/api/cart";
 import { ScrollView } from "react-native";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-import { Button } from "@rneui/base";
 import Icon from "@rneui/themed/dist/Icon";
-
-const cartDataTest: ProductInShop = {
-  available: true,
-  availableQuantity: Math.trunc(Math.random() * 100),
-  price: 2.99,
-  id: "1",
-  name: "Test Product",
-  image_url: "https://via.placeholder.com/150",
-  testNutriments: {
-    "energy-kcal": 0,
-    fat: 0,
-    proteins: 0,
-    carbohydrates: 0,
-    fiber: 0,
-    salt: 0,
-    sugars: 0,
-    sodium: 0,
-  },
-  brands: "",
-  product_name_fr: "",
-  generic_name_fr: "",
-  ingredients_text: "",
-  link: "",
-  categories: [],
-  ingredients: [],
-  allergens: [],
-  quantity: "",
-};
+import ProductCard from "@/components/custom/ProductCart";
+import { CartResponseDao } from "@/constants/interface/Cart";
 export default function Cart() {
-  const [cart, setCart] = useState<ProductInShop[]>([]);
-  const { getCart } = useCartApi();
+  const [cart, setCart] = useState<CartResponseDao>();
+  const { getCart, loading } = useCartApi();
   useEffect(() => {
     const fetchCart = async () => {
-      // const cartData = await getCart("1");
-      // const cartDataInShop = cartData.map((product) => ({
-      //   ...product,
-      //   available: true,
-      //   availableQuantity: 1,
-      //   price: 2.99,
-      // }));
-
-      setCart([
-        cartDataTest,
-        cartDataTest,
-        cartDataTest,
-        cartDataTest,
-        cartDataTest,
-      ]);
+      const cart = await getCart(1);
+      if (!cart) {
+        return;
+      }
+      setCart(cart);
     };
     fetchCart();
   }, []);
-
   return (
     <SafeAreaView>
       <View style={styles.container}>
         {/* <Image
-          source={require("../../assets/images/background.png")}
-          style={styles.backgroundImage}
-        /> */}
+            source={require("../../assets/images/background.png")}
+            style={styles.backgroundImage}
+          /> */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>
-            {cart.length} differents products for{" "}
+            {cart?.products.length} differents products for{" "}
           </Text>
           <Text style={styles.headerPrice}>
-            {" "}
-            <Text style={styles.totalPrice}>30.00 €</Text>
+            <Text style={styles.totalPrice}> 30.00 €</Text>
           </Text>
         </View>
       </View>
       <View style={styles.productCardContainer}>
         <ScrollView style={styles.scrollArea}>
-          {" "}
-          {cart.map((product) => (
-            <View
-              key={product.id + Math.random().toString()}
-              style={styles.productCard}
-            >
-              <Image
-                source={{
-                  uri: "https://www.granitz.fr/images/image-not-found.jpg",
-                }}
-                style={styles.productImage}
-              />
-              <View style={styles.cardInfo}>
-                <ThemedText>{product.name}</ThemedText>
-                <View style={{ flexDirection: "row" }}>
-                  <ThemedText style={styles.price}>
-                    {product.price} €
-                  </ThemedText>
-                  <View style={styles.quantity}>
-                    <TouchableOpacity
-                      style={styles.btnRemove}
-                      onPress={() => console.log("remove")}
-                    >
-                      <Icon name={"remove"} size={15} color="white" />
-                    </TouchableOpacity>
-                    <ThemedText style={styles.quantityText}>
-                      {product.availableQuantity}
-                    </ThemedText>
-                    <TouchableOpacity
-                      style={styles.btnAdd}
-                      onPress={() => console.log("add")}
-                    >
-                      <Icon name={"add"} size={15} color="white" />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
-            </View>
-          ))}
+          {loading ? (
+            <Fragment>loading..</Fragment>
+          ) : (
+            cart?.products.map((product) => {
+              return <ProductCard product={product} />;
+            })
+          )}
         </ScrollView>
       </View>
       <View style={styles.payArea}>

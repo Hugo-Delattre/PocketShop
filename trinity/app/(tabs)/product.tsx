@@ -26,8 +26,10 @@ import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { Ionicons } from "@expo/vector-icons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { ScrollView } from "react-native";
+import useCartApi from "@/hooks/api/cart";
 export default function ProductScreen() {
   const router = useRouter();
+  const { addToCart, removeFromCart } = useCartApi();
   const params = useLocalSearchParams();
   const { getProduct, loading } = useProductApi();
   const [product, setProduct] = useState<Product | null>(null);
@@ -39,14 +41,13 @@ export default function ProductScreen() {
     : params?.productId;
 
   useEffect(() => {
-    console.log("Product ID", productId);
     const fetchProduct = async () => {
       const productData = await getProduct(productId);
-      console.log("Product Data", productData);
+      // console.log("Product Data", productData);
 
       if (productData) {
         //TODO: remove this .product after fixing the API
-        setProduct(productData.product);
+        setProduct(productData);
       }
     };
 
@@ -80,10 +81,6 @@ export default function ProductScreen() {
   };
 
   //END TEST
-  function addToCart(product: Product) {
-    console.log(`Adding product ${product.name} to cart`);
-  }
-
   return (
     <SafeAreaView>
       <View style={styles.container}>
@@ -166,7 +163,12 @@ export default function ProductScreen() {
           color={"#0B132B"}
           title="Add to Cart"
           onPress={() => {
-            addToCart(product);
+            console.log("Adding to cart", product.code);
+            addToCart({
+              productId: product.code,
+              shopId: "1",
+              userId: "1",
+            });
           }}
           radius={5}
         >
