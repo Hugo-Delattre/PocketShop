@@ -64,10 +64,7 @@ export default async function UserPage() {
 
     return (
         <div className="container mx-auto py-10">
-            <h1>Users</h1>
-            {/* <Link href="/wow">
-                <Button>Go to Wow</Button>
-            </Link> */}
+            <h1 className="pl-10 font-bold text-2xl">Users</h1>
             <div className="flex justify-start pl-10">
                 <DataTable columns={columns} data={data} />
             </div>

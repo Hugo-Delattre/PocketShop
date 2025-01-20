@@ -50,7 +50,9 @@ export default function CreateUserButton() {
                             <Label htmlFor="password">Password</Label>
                             <Input id="password" type="password" {...register("password")} />
                         </div>
-                        <Button type="submit">Submit</Button>
+                        <div style={{ marginTop: '20px', textAlign: 'right' }}>
+                            <Button type="submit">Create</Button>
+                        </div>
                     </form>
                 </DialogContent>
             </Dialog>

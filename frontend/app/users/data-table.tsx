@@ -67,7 +67,7 @@ export function DataTable<TData, TValue>({
             <div className="flex items-center justify-between py-4">
                 <div className="flex items-center space-x-2">
                     <Input
-                        placeholder="Search"
+                        placeholder="Search email"
                         value={
                             (table
                                 .getColumn("email")
