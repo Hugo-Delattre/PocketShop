@@ -8,7 +8,7 @@ DOCKER_COMPOSE=docker-compose
 
 # Lancer l'env de dev
 dev:
-	$(DOPPLER) --config dev -- $(DOCKER_COMPOSE) --env-file .env.local up -d --build $(ARGS)
+	$(DOPPLER) --config dev -- $(DOCKER_COMPOSE) up -d --build $(ARGS)
 
 prd:
 	$(DOPPLER) --config prd -- $(DOCKER_COMPOSE) --profile prd up --build -d
