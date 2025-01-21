@@ -68,22 +68,23 @@ services:
     networks:
       - default
 
-    # frontend:
-    #   build:
-    #     context: ./frontend
-    #     dockerfile: ${DOCKERFILE}
-    #   container_name: react
-    #   ports:
-    #     - "3002:3000"
-    #   environment:
-    #     - NODE_ENV=${NODE_ENV}
-    #   volumes:
-    #     - ${PWD}/frontend:/app
-    #     - /app/node_modules
-    #   depends_on:
-    #     db:
-    #       condition: service_healthy
-    #   restart: always
+  frontoffice:
+    build:
+      context: ./frontend/frontoffice
+      dockerfile: ${DOCKERFILE}
+    container_name: frontoffice
+    ports:
+      - "3002:3000"
+    volumes:
+      - ${PWD}/frontend/frontoffice:/app:delegate
+      # - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - FAST_REFRESH=true
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: always
 
   prometheus:
     container_name: prometheus
