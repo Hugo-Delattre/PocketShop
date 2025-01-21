@@ -1,0 +1,61 @@
+---
+- name: Déployer le projet depuis GitLab
+  hosts: all
+  vars:
+    git_repo_url: "git@t-dev.epitest.eu:BDX_1/trinity/app.git"
+    remote_project_path: "/home/andy/project/trinity"
+    branch: "main"
+
+  tasks:
+    # 1. Installer git si nécessaire
+    - name: Installer git si nécessaire
+      become: yes
+      package:
+        name: git
+        state: present
+
+    # 2. Vérifier si le dépôt existe déjà
+    - name: Vérifier si le dépôt Git existe
+      stat:
+        path: "{{ remote_project_path }}"
+      register: project_dir
+
+    # 3. Cloner le dépôt GitLab si nécessaire
+    - name: Cloner le dépôt GitLab si le dossier n'existe pas
+      git:
+        repo: "{{ git_repo_url }}"
+        dest: "{{ remote_project_path }}"
+        version: "{{ branch }}"
+        clone: yes
+        update: no
+      when: project_dir.stat.exists == false
+
+    # 4. Mettre à jour le dépôt si le dossier existe déjà
+    - name: Mettre à jour le dépôt GitLab si nécessaire
+      git:
+        repo: "{{ git_repo_url }}"
+        dest: "{{ remote_project_path }}"
+        version: "{{ branch }}"
+        clone: no
+        update: yes
+        force: yes
+      when: project_dir.stat.exists == true
+
+    # 5. Vérifier la présence du fichier docker-compose.yml
+    - name: Vérifier la présence du fichier docker-compose.yml
+      stat:
+        path: "{{ remote_project_path }}/docker-compose.yml"
+      register: docker_compose_file
+
+    - name: Assurer la présence du fichier docker-compose.yml
+      debug:
+        msg: "Le fichier docker-compose.yml existe sur le serveur"
+      when: docker_compose_file.stat.exists
+
+    # 6. Démarrer les services avec Doppler et docker-compose
+    - name: Démarrer les services avec Doppler et docker-compose
+      command: "doppler run --config prd -- docker-compose -f {{ remote_project_path }}/docker-compose.yml up -d"
+      environment:
+        DOPPLER_TOKEN: "{{ lookup('env', 'DOPPLER_TOKEN') }}"
+      register: docker_compose_status
+      failed_when: docker_compose_status.rc != 0
