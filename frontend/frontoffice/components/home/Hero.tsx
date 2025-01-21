@@ -39,7 +39,7 @@ const Hero = ({
         </p>
       </section>
       {/* </motion.div> */}
-      <CTAButton locale={CTALocale}></CTAButton>
+      {/* <CTAButton locale={CTALocale}></CTAButton> */}
     </>
   );
 };

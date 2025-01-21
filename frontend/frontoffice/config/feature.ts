@@ -8,38 +8,33 @@ import { MdCloudUpload } from "react-icons/md";
 export const FEATURES_EN = [
   {
     title: "Connexion",
-    content: "Completely free with a wealth of customization options.",
-    icon: BsGithub,
+    content: "Quickly log in to sync your information and manage your preferences across all your devices.",
+    icon: "🔒",
   },
   {
     title: "Scanner",
-    content:
-      "Templates meticulously designed to ensure optimal display on any device.",
-    icon: FaMobileScreenButton,
+    content: "Use your phone to scan product barcodes and easily add items to your cart.",
+    icon: "📱",
   },
   {
-    title: "Retrouvez vos produits",
-    content:
-      "Effortlessly change colors, fonts, and layouts without any coding knowledge.",
-    icon: FaToolbox,
+    title: "Find your products",
+    content: "Once scanned, your products are saved and you can find them at any time to finalize your cart.",
+    icon: "🔍",
   },
   {
-    title: "Gérez vos paniers",
-    content:
-      "Templates built with search engine optimization in mind to enhance your website's discoverability.",
-    icon: MagnetIcon,
+    title: "Manage your carts",
+    content: "Add, modify, and organize the products in your cart to prepare your purchases optimally.",
+    icon: "🛒",
   },
   {
-    title: "Payez avec PayPal",
-    content:
-      "Supports multiple languages, making your website attractive to a global audience.",
-    icon: FaEarthAsia,
+    title: "Pay with PayPal",
+    content: "Proceed with the secure payment of your items directly via PayPal, a simple and fast method.",
+    icon: "💳",
   },
   {
-    title: "Historique d'achats",
-    content:
-      "Tightly integrated with leading web hosting services for instant website publishing.",
-    icon: MdCloudUpload,
+    title: "Purchase history",
+    content: "Access the history of your past purchases to track your expenses and manage your orders easily.",
+    icon: "📜",
   },
 ];
 
