@@ -7,15 +7,13 @@ export const getProducts = async () => {
   });
 };
 
-export type UpdateProductType = {
-  open_food_fact_id: string;
-};
+export type UpdateProductType = Partial<createProductType>;
 export type ProductType = {
   id: number;
   open_food_fact_id: string;
   inventory: {
     id: number;
-    price: string;
+    price: number;
     quantity: number;
     shop: { name: string; id: number };
   }[];
@@ -43,9 +41,9 @@ export const deleteProduct = async (productId: number) => {
 };
 
 export type createProductType = {
-  open_food_fact_id: string;
+  openFoodFactId: string;
   quantity: number;
-  price: string;
+  price: number;
 };
 
 export const createProduct = async (product: createProductType) => {

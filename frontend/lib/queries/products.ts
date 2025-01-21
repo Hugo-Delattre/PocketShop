@@ -11,32 +11,34 @@ export function useGetProducts() {
   return useQuery<ProductType[]>({
     queryKey: ["getProducts"],
     queryFn: () => getProducts().then((res) => res.data),
-    staleTime: 20000,
   });
 }
-
-export const useCreateProduct = () => {
-  const queryClient = useQueryClient();
-
-  const mutationObj = useMutation({
-    mutationFn: createProduct,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: "getProducts" });
-    },
-  });
-
-  return mutationObj;
-};
 
 export const useUpdateProduct = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: updateProduct,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: "getProducts" });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["getProducts"],
+        refetchType: "all",
+      });
     },
   });
+};
+
+export const useCreateProduct = () => {
+  const queryClient = useQueryClient();
+
+  const mutationObj = useMutation({
+    mutationFn: createProduct,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["getProducts"] });
+    },
+  });
+
+  return mutationObj;
 };
 
 export const useDeleteProduct = () => {
@@ -44,8 +46,8 @@ export const useDeleteProduct = () => {
 
   return useMutation({
     mutationFn: deleteProduct,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: "getProducts" });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["getProducts"] });
     },
   });
 };

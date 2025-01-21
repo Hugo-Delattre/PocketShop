@@ -13,12 +13,19 @@ import { useState } from "react";
 export function ProductsPage() {
   const { data, isLoading } = useGetProducts();
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [editItem, setEditItem] = useState({ open_food_fact_id: "", id: 0 });
+  const [editingProductId, setEditingProductId] = useState<number | null>(null);
 
   const handleEdit = (item: ProductType) => {
-    setIsEditing(true);
-    setEditItem(item);
+    setEditingProductId(item.id);
+    setShowModal(true);
+    setNewItem({
+      openFoodFactId: item.open_food_fact_id,
+      quantity: item.inventory[0].quantity,
+      price:
+        parseFloat(
+          parseFloat(item.inventory[0].price as unknown as string).toFixed(2)
+        ) ?? "0",
+    });
   };
 
   const { mutateAsync: deleteProduct } = useDeleteProduct();
@@ -26,31 +33,36 @@ export function ProductsPage() {
   const { mutateAsync: createProduct } = useCreateProduct();
 
   const handleUpdate = async () => {
+    if (!editingProductId) {
+      return;
+    }
+
     await updateProduct({
-      productId: editItem.id,
-      product: editItem,
+      productId: editingProductId,
+      product: newItem,
     });
-    setIsEditing(false);
-    setEditItem({ open_food_fact_id: "", id: 0 });
+    setEditingProductId(null);
+    setShowModal(false);
+    setNewItem({ openFoodFactId: "", quantity: 0, price: 0 });
   };
 
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [newItem, setNewItem] = useState({
-    open_food_fact_id: "",
+    openFoodFactId: "",
     quantity: 0,
-    price: "0",
+    price: 0,
   });
 
   const handleAdd = async () => {
-    if (!newItem.open_food_fact_id) {
+    if (!newItem.openFoodFactId) {
       alert("Veuillez remplir tous les champs");
       return;
     }
 
     await createProduct(newItem);
 
-    setNewItem({ open_food_fact_id: "", quantity: 0, price: "0" });
-    setShowCreateModal(false);
+    setNewItem({ openFoodFactId: "", quantity: 0, price: 0 });
+    setShowModal(false);
   };
 
   if (isLoading) {
@@ -61,7 +73,10 @@ export function ProductsPage() {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">Liste des Produits</h2>
         <button
-          onClick={() => setShowCreateModal(true)}
+          onClick={() => {
+            setNewItem({ openFoodFactId: "", quantity: 0, price: 0 });
+            setShowModal(true);
+          }}
           className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
         >
           <Plus className="w-4 h-4" />
@@ -70,13 +85,13 @@ export function ProductsPage() {
       </div>
 
       {/* Modal de création */}
-      {showCreateModal && (
+      {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg w-96">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-bold">Nouveau Produit</h3>
               <button
-                onClick={() => setShowCreateModal(false)}
+                onClick={() => setShowModal(false)}
                 className="text-gray-500 hover:text-gray-700"
               >
                 <X className="w-4 h-4" />
@@ -89,11 +104,11 @@ export function ProductsPage() {
                 </label>
                 <input
                   type="number"
-                  value={newItem.open_food_fact_id}
+                  value={newItem.openFoodFactId}
                   onChange={(e) =>
                     setNewItem({
                       ...newItem,
-                      open_food_fact_id: e.target.value,
+                      openFoodFactId: e.target.value,
                     })
                   }
                   className="border rounded px-3 py-2 w-full"
@@ -123,23 +138,26 @@ export function ProductsPage() {
                   step="0.01"
                   value={newItem.price}
                   onChange={(e) =>
-                    setNewItem({ ...newItem, price: e.target.value })
+                    setNewItem({
+                      ...newItem,
+                      price: parseFloat(parseFloat(e.target.value).toFixed(2)),
+                    })
                   }
                   className="border rounded px-3 py-2 w-full"
                 />
               </div>
               <div className="flex justify-end gap-2 mt-4">
                 <button
-                  onClick={() => setShowCreateModal(false)}
+                  onClick={() => setShowModal(false)}
                   className="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50"
                 >
                   Annuler
                 </button>
                 <button
-                  onClick={handleAdd}
+                  onClick={editingProductId ? handleUpdate : handleAdd}
                   className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
                 >
-                  Créer
+                  {editingProductId ? "Modifier" : "Créer"}
                 </button>
               </div>
             </div>
@@ -166,21 +184,7 @@ export function ProductsPage() {
             {data?.map((item) => (
               <tr key={item.id}>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  {isEditing && editItem.id === item.id ? (
-                    <input
-                      type="number"
-                      value={editItem.open_food_fact_id}
-                      onChange={(e) =>
-                        setEditItem({
-                          ...editItem,
-                          open_food_fact_id: e.target.value,
-                        })
-                      }
-                      className="border rounded px-2 py-1 w-full"
-                    />
-                  ) : (
-                    item.open_food_fact_id
-                  )}
+                  {item.open_food_fact_id}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   {item.inventory.map(({ id, quantity, price }) => (
@@ -190,29 +194,20 @@ export function ProductsPage() {
                   ))}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  {isEditing && editItem.id === item.id ? (
+                  <div className="flex space-x-4">
                     <button
-                      onClick={handleUpdate}
-                      className="text-blue-600 hover:text-blue-900 mr-4"
+                      onClick={() => handleEdit(item)}
+                      className="text-blue-600 hover:text-blue-900"
                     >
-                      Sauvegarder
+                      <Pencil className="w-4 h-4" />
                     </button>
-                  ) : (
-                    <div className="flex space-x-4">
-                      <button
-                        onClick={() => handleEdit(item)}
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => deleteProduct(item.id)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  )}
+                    <button
+                      onClick={() => deleteProduct(item.id)}
+                      className="text-red-600 hover:text-red-900"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
