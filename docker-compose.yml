@@ -68,22 +68,23 @@ services:
     networks:
       - default
 
-    # frontend:
-    #   build:
-    #     context: ./frontend
-    #     dockerfile: ${DOCKERFILE}
-    #   container_name: react
-    #   ports:
-    #     - "3002:3000"
-    #   environment:
-    #     - NODE_ENV=${NODE_ENV}
-    #   volumes:
-    #     - ${PWD}/frontend:/app
-    #     - /app/node_modules
-    #   depends_on:
-    #     db:
-    #       condition: service_healthy
-    #   restart: always
+  frontoffice:
+    build:
+      context: ./frontend/frontoffice
+      dockerfile: ${DOCKERFILE}
+    container_name: frontoffice
+    ports:
+      - "3002:3000"
+    volumes:
+      - ${PWD}/frontend/frontoffice:/app
+      # - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - FAST_REFRESH=true
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: always
 
   prometheus:
     container_name: prometheus
@@ -96,19 +97,19 @@ services:
       - monitoring
     privileged: true
 
-  # cadvisor:
-  #   container_name: cadvisor
-  #   image: gcr.io/cadvisor/cadvisor:latest
-  #   ports:
-  #     - "8080:8080"
-  #   volumes:
-  #     - /:/rootfs:ro
-  #     - /var/run:/var/run:rw
-  #     - /sys:/sys:ro
-  #     - /var/lib/docker/:/var/lib/docker:ro
-  #   networks:
-  #     - monitoring
-  #   privileged: true
+  cadvisor:
+    container_name: cadvisor
+    image: gcr.io/cadvisor/cadvisor:latest
+    ports:
+      - "8085:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - monitoring
+    privileged: true
 
   grafana:
     container_name: grafana

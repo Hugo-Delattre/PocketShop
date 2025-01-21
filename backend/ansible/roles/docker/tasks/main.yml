@@ -1,2 +1,0 @@
-- name: Installation de Docker et Docker Compose
-  include: install.yml

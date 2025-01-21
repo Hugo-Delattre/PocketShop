@@ -26,6 +26,16 @@ deploy:
 	ansible-playbook -i ansible/inventory ansible/playbooks/deploy.yml --ask-become-pass
 
 
+restart:
+	$(DOPPLER) --config dev -- $(DOCKER_COMPOSE) up -d $(ARGS) $(SERVICE)
+
+stop-service:
+	$(DOPPLER) --config dev -- $(DOCKER_COMPOSE) stop $(SERVICE)
+
+start-service:
+	$(DOPPLER) --config dev -- $(DOCKER_COMPOSE) start $(SERVICE)
+
+
 # ----------------------------------------------------------------
 
 # Section DevOps
