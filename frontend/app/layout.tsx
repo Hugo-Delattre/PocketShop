@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "../styles/globals.css";
 import Navbar from "@/components/navbar/navbar";
+import { Providers } from "@/utils/providers";
+import { useQuery } from "@tanstack/react-query";
 
 const geistSans = localFont({
   src: "../fonts/GeistVF.woff",
@@ -24,14 +26,19 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Queries
+  // const query = useQuery({ queryKey: ["todos"], queryFn: getTodos });
+
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased vsc-initialized`}
-      >
-        <Navbar />
-        {children}
-      </body>
-    </html>
+    <Providers>
+      <html lang="en">
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased vsc-initialized`}
+        >
+          <Navbar />
+          {children}
+        </body>
+      </html>
+    </Providers>
   );
-} 
+}

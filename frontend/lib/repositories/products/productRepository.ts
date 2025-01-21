@@ -1,0 +1,57 @@
+import apiClient from "../apiClient";
+
+export const getProducts = async () => {
+  return await apiClient({
+    method: "get",
+    url: `/products`,
+  });
+};
+
+export type UpdateProductType = {
+  open_food_fact_id: string;
+};
+export type ProductType = {
+  id: number;
+  open_food_fact_id: string;
+  inventory: {
+    id: number;
+    price: string;
+    quantity: number;
+    shop: { name: string; id: number };
+  }[];
+};
+
+export const updateProduct = async ({
+  productId,
+  product,
+}: {
+  productId: number;
+  product: UpdateProductType;
+}) => {
+  return await apiClient({
+    method: "patch",
+    url: `/products/${productId}`,
+    data: product,
+  });
+};
+
+export const deleteProduct = async (productId: number) => {
+  return await apiClient({
+    method: "delete",
+    url: `/products/${productId}`,
+  });
+};
+
+export type createProductType = {
+  open_food_fact_id: string;
+  quantity: number;
+  price: string;
+};
+
+export const createProduct = async (product: createProductType) => {
+  return await apiClient({
+    method: "post",
+    url: `/products`,
+    data: product,
+  });
+};
