@@ -3,7 +3,7 @@
   hosts: all
   vars:
     git_repo_url: "git@t-dev.epitest.eu:BDX_1/trinity/app.git"
-    remote_project_path: "/home/andy/project/trinity"
+    remote_project_path: "/home/andy/project/"
     branch: "main"
 
   tasks:
