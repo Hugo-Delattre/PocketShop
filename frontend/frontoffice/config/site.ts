@@ -7,7 +7,7 @@ const OPEN_SOURCE_URL = 'https://t-dev.epitest.eu/BDX_1/trinity/app'
 const baseSiteConfig = {
   name: "T-DEV-702 Trinity",
   description:
-    "Une application mobile pour faire ses courses en toute simplicité",
+    "A mobile application for shopping with ease",
   url: "https://landingpage.weijunext.com",
   ogImage: "https://landingpage.weijunext.com/og.png",
   metadataBase: '/',
