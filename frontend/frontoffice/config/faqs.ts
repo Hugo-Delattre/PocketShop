@@ -1,63 +1,63 @@
 export const FAQS_EN = [
   {
-    title: "What is a landing page?",
+    title: "What is this app about?",
     content:
-      "A landing page is a standalone web page created specifically for a marketing or advertising campaign. It's where a visitor 'lands' after they click on a link in an email, or ads from Google, Bing, YouTube, Facebook, Instagram, Twitter, or similar places on the web. Unlike web pages, which typically have many goals and encourage exploration, landing pages are designed with a single focus or goal, known as a call to action (CTA).",
+      "This app is designed to simplify your shopping experience. You can scan products, add them to your cart, and securely pay using PayPal—all directly from your mobile device. No more long checkout lines or unnecessary delays!",
   },
   {
-    title: "How can I create a landing page?",
+    title: "How do I scan a product?",
     content:
-      "Creating a landing page can be done in several steps: 1) Choose a landing page template that fits your campaign's needs or start from scratch. 2) Identify your landing page's objective and CTA. 3) Write compelling content that urges visitors to take action. 4) Incorporate design elements such as images, videos, and forms that align with your message. 5) Test your page's usability and mobile responsiveness. 6) Use SEO best practices to help your page get found. 7) Publish your landing page and monitor its performance to make adjustments as needed.",
+      "To scan a product, simply open the app and use the built-in camera feature. Point your camera at the product's barcode, and the app will automatically add it to your cart.",
   },
   {
-    title: "Why is a landing page important?",
+    title: "Can I use this app in any store?",
     content:
-      "Landing pages are crucial for any marketing strategy because they provide a targeted platform for converting visitors into leads or customers. Unlike general websites, landing pages focus the visitor's attention on a single offer, minimizing distractions and guiding them towards a specific action. This focused approach can significantly increase the effectiveness of your marketing campaigns, improve your ad performance, and enhance the overall user experience by providing them with the information or solution they were seeking.",
+      "Currently, the app works with participating stores that support this technology. We're actively expanding our network of partners, so stay tuned for more options near you.",
   },
   {
-    title: "Why choose our landing page boilerplate?",
+    title: "Why should I use this app?",
     content:
-      "Our landing page template is free, open-source, and powerful, making it ideal for various projects and marketing campaigns. It allows you to create a landing page in under an hour, simplifying the development process while also offering a high degree of customization and responsiveness.",
+      "This app saves you time and offers a seamless shopping experience. It eliminates the need to wait in line at checkout, and with PayPal integration, you can pay securely in just a few taps.",
   },
   {
-    title: "What skills do I need to use this template?",
+    title: "How do I pay for my items?",
     content:
-      "To use our landing page template, you only need basic web editing skills. The design of the template is intended to be easy for non-technical users to get started with, while also providing high customizability for experienced developers.",
+      "Once you've added all your items to the cart, proceed to checkout. The app is integrated with PayPal, allowing you to complete your payment quickly and securely.",
   },
   {
-    title: "How do I get started with the landing page template?",
+    title: "Is my payment information secure?",
     content:
-      "Getting started is very simple. Just download the source code from our GitHub repository, edit the text and images as needed, and then deploy it to your server.",
+      "Yes, your payment information is completely secure. We use PayPal's trusted payment system, which encrypts your data and ensures a safe transaction every time.",
   },
   {
-    title: "Does the landing page template support responsive design?",
+    title: "Can I track my purchase history?",
     content:
-      "Yes, our landing page template supports responsive design, ensuring that your webpage displays perfectly on a variety of devices, whether desktop, tablet, or smartphone.",
+      "Absolutely! The app keeps a detailed record of your past purchases, allowing you to review them at any time in the 'Order History' section.",
   },
   {
-    title: "Can I use this template for a commercial project?",
+    title: "Does the app work offline?",
     content:
-      "Absolutely. Our template is open-source, and you can use it for any type of project, including commercial purposes. We encourage users to utilize this template to create and optimize their online projects.",
+      "To scan products and make payments, an internet connection is required. However, you can browse your cart and view past purchases offline.",
   },
   {
-    title: "Do you offer any customization services?",
+    title: "Can I share my cart with someone else?",
     content:
-      "We accept paid custom development of landing pages. Please contact us via email at weijunext@gmail.com or Twitter @weijunext.",
+      "Yes, you can easily share your cart with friends or family by generating a unique link. This makes group shopping more convenient than ever.",
   },
   {
-    title: "Are there any restrictions on using this template?",
+    title: "Are there any restrictions on using the app?",
     content:
-      "No. You are free to use and modify this template. At the same time, we encourage developers to submit PRs to help improve this landing page template together.",
+      "There are no major restrictions. However, you must have a PayPal account to complete payments, and the app is compatible with participating stores only.",
   },
   {
-    title: "Does this template include SEO optimization features?",
+    title: "Does the app support promotions or discounts?",
     content:
-      "Yes, our template includes basic SEO optimization features to help your webpage achieve better rankings in search engines.",
+      "Yes, you can apply promotions or discount codes directly in the app during checkout, provided they are valid for your selected items or store.",
   },
   {
-    title: "What should I do if I encounter problems using the template?",
+    title: "What should I do if I encounter problems with the app?",
     content:
-      "If you encounter any issues while using the template, please contact us via Twitter @weijunext.",
+      "If you experience any issues, feel free to contact us via email at support@shoppingapp.com or on Twitter @shoppingapp_support. We're here to help!",
   },
 ];
 

@@ -32,7 +32,7 @@ export default async function HomeIndex({ lang }: { lang: string }) {
       <FAQ id="FAQ" locale={dict.FAQ} langName={langName} />
 
       {/* CTA (Call to Action) */}
-      <CTA locale={dict.CTA} CTALocale={dict.CTAButton} />
+      {/* <CTA locale={dict.CTA} CTALocale={dict.CTAButton} /> */}
     </>
   );
 }
