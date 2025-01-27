@@ -54,7 +54,8 @@
 
     # 6. Démarrer les services avec Doppler et docker-compose
     - name: Démarrer les services avec Doppler et docker-compose
-      command: "doppler run --config prd -- docker compose -f {{ remote_project_path }}/docker-compose.yml up -d"
+      # command: "doppler run --config prd -- docker compose -f {{ remote_project_path }}/docker-compose.yml up -d"
+      command: "doppler run --config prd -- docker compose up -d --build $(ARGS)"
       environment:
         DOPPLER_TOKEN: "{{ lookup('env', 'DOPPLER_TOKEN') }}"
       register: docker_compose_status
