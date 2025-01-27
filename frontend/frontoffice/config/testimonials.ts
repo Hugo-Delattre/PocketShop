@@ -65,7 +65,7 @@ export const TestimonialsData = [
   {
     user: {
       name: "Armand O.",
-      username: "kaaris",
+      username: "KaarisOfficiel",
       image: "/images/users/4.png",
     },
     content:
