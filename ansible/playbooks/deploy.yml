@@ -3,7 +3,7 @@
   hosts: all
   vars:
     git_repo_url: "git@t-dev.epitest.eu:BDX_1/trinity/app.git"
-    remote_project_path: "/home/andy/project/"
+    remote_project_path: "/home/andy/project/app"
     branch: "main"
 
   tasks:
@@ -54,7 +54,7 @@
 
     # 6. Démarrer les services avec Doppler et docker-compose
     - name: Démarrer les services avec Doppler et docker-compose
-      command: "doppler run --config prd -- docker-compose -f {{ remote_project_path }}/docker-compose.yml up -d"
+      command: "doppler run --config prd -- docker compose -f {{ remote_project_path }}/docker-compose.yml up -d"
       environment:
         DOPPLER_TOKEN: "{{ lookup('env', 'DOPPLER_TOKEN') }}"
       register: docker_compose_status
