@@ -1,7 +1,7 @@
 stages:
   - lint
-  - test
   - build
+  - test
   - deploy
 
 variables:
@@ -26,6 +26,22 @@ lint:
   only:
     - merge_requests
     - main
+  tags:
+    - docker
+
+build:
+  stage: build
+  image: node:23
+  before_script:
+    - curl -Ls https://cli.doppler.com/install.sh | sh
+    - echo "DOPPLER_TOKEN=$DOPPLER_TOKEN"
+    - doppler configure --token $DOPPLER_TOKEN --scope t-dev-702
+    - doppler run --config dev -- npm ci
+  script:
+    - doppler run -- npm run build
+  artifacts:
+    paths:
+      - dist/
   tags:
     - docker
 
@@ -61,36 +77,19 @@ test:
     - main
   tags:
     - docker
+  # when: always
 
-build:
-  stage: build
-  image: node:23
-  before_script:
-    - doppler run -- npm ci
-  script:
-    - npm run build
-  artifacts:
-    paths:
-      - dist/
-  only:
-    - main
-  tags:
-    - docker
 
 deploy:
   stage: deploy
-  image: docker:24.0.5
-  services:
-    - docker:24.0.5-dind
+  image: node:23
   before_script:
-    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
-    - apk add --no-cache docker-compose  # Si nécessaire
-    - doppler run -- docker-compose build app
+    - curl -sSL https://cli.doppler.com/install.sh | sh
+    - doppler configure --token $DOPPLER_TOKEN --scope t-dev-702
   script:
-    - doppler run -- docker-compose up -d
-  after_script:
-    - docker-compose down
+    - doppler secrets download --no-file | while read -r line; do export $line; done
+    - ansible-playbook -i ansible/inventory ansible/playbooks/deploy.yml --become --extra-vars "ansible_become_pass=$ANSIBLE_BECOME_PASS"
+  when: manual
+  allow_failure: true
   only:
     - main
-  tags:
-    - docker
