@@ -7,10 +7,20 @@ import {
   updateProduct,
 } from "../repositories/products/productRepository";
 
-export function useGetProducts() {
-  return useQuery<ProductType[]>({
-    queryKey: ["getProducts"],
-    queryFn: () => getProducts().then((res) => res.data),
+export function useGetProducts(queryPagination?: {
+  skip?: number;
+  take?: number;
+}) {
+  console.log(queryPagination);
+
+  return useQuery<[ProductType[], number]>({
+    queryKey: [
+      "getProducts",
+      `skip: ${queryPagination?.skip}`,
+      `take: ${queryPagination?.take}`,
+    ],
+    staleTime: 20000,
+    queryFn: () => getProducts(queryPagination ?? {}).then((res) => res.data),
   });
 }
 

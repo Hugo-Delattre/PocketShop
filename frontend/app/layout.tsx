@@ -1,20 +1,8 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import "../styles/globals.css";
 import Navbar from "@/components/navbar/navbar";
 import { Providers } from "@/utils/providers";
-import { useQuery } from "@tanstack/react-query";
-
-const geistSans = localFont({
-  src: "../fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "../fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+import { crimson, karla } from "@/fonts/fonts";
 
 export const metadata: Metadata = {
   title: "Trinity",
@@ -26,14 +14,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Queries
-  // const query = useQuery({ queryKey: ["todos"], queryFn: getTodos });
-
   return (
     <Providers>
-      <html lang="en">
+      <html lang="en" className="h-full">
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased vsc-initialized`}
+          className={`${karla.className} ${karla.variable} ${crimson.variable} antialiased vsc-initialized h-full`}
         >
           <Navbar />
           {children}

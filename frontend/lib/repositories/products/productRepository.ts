@@ -1,9 +1,15 @@
 import apiClient from "../apiClient";
 
-export const getProducts = async () => {
+export const getProducts = async ({
+  skip,
+  take,
+}: {
+  skip?: number;
+  take?: number;
+}) => {
   return await apiClient({
     method: "get",
-    url: `/products`,
+    url: `/products?skip=${skip}&take=${take}`,
   });
 };
 
