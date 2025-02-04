@@ -11,8 +11,6 @@ export function useGetProducts(queryPagination?: {
   skip?: number;
   take?: number;
 }) {
-  console.log(queryPagination);
-
   return useQuery<[ProductType[], number]>({
     queryKey: [
       "getProducts",
