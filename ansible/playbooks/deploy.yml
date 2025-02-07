@@ -57,6 +57,6 @@
       # command: "doppler run --config prd -- docker compose -f {{ remote_project_path }}/docker-compose.yml up -d"
       command: "doppler run --config dev -- docker compose -f {{ remote_project_path }}/docker-compose.yml up -d --build"
       environment:
-        DOPPLER_TOKEN: "{{ lookup('env', 'DOPPLER_TOKEN') }}"
+        DOPPLER_TOKEN: "{{ lookup('env', 'DOPPLER_TOKEN2') }}"
       register: docker_compose_status
       failed_when: docker_compose_status.rc != 0
