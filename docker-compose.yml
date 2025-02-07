@@ -68,6 +68,24 @@ services:
     networks:
       - default
 
+  backoffice:
+    build:
+      context: ./frontend/backoffice
+      dockerfile: ${DOCKERFILE}
+    container_name: backoffice
+    ports:
+      - "3003:3000"
+    volumes:
+      - ${PWD}/frontend/backoffice:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - FAST_REFRESH=true
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: always
+
   frontoffice:
     build:
       context: ./frontend/frontoffice
