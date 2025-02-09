@@ -12,7 +12,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  const allowedOrigins = ['http://localhost:3000', 'http://localhost:8080'];
+  const allowedOrigins = ['http://localhost:3000', 'http://localhost:8080', 'http://localhost:1234'];
   app.enableCors({
     origin: (origin, callback) => {
       if (!origin || allowedOrigins.includes(origin)) {
@@ -22,7 +22,7 @@ async function bootstrap() {
       }
     },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: 'Content-Type, Accept',
+    allowedHeaders: 'Content-Type, Accept, Authorization',
     credentials: true,
   });
   const config = new DocumentBuilder()
