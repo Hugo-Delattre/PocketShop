@@ -18,10 +18,16 @@ export default function RootLayout({
     <Providers>
       <html lang="en" className="h-full">
         <body
-          className={`${karla.className} ${karla.variable} ${crimson.variable} antialiased vsc-initialized h-full`}
+          style={{
+            gridTemplateColumns: "5rem auto",
+            gridTemplateRows: "100vh",
+          }}
+          className={`${karla.className} ${karla.variable} ${crimson.variable} h-full antialiased vsc-initialized h-full grid `}
         >
-          <Navbar />
-          {children}
+          <div className="col-start-1">
+            <Navbar />
+          </div>
+          <div className="col-start-2">{children}</div>
         </body>
       </html>
     </Providers>

@@ -55,6 +55,9 @@ apiClient.interceptors.response.use(
       token.removeToken("ACCESS_TOKEN_KEY");
       window.location.reload();
     }
+    if (status === 401) {
+      window.location.assign("/login");
+    }
 
     logOnDev(
       `🚨 [${method?.toUpperCase()}] ${url} | Error ${status} ${
