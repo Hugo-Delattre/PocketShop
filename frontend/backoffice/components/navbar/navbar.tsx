@@ -49,9 +49,6 @@ function Navbar() {
           <Link href="/login">
             <Button variant="outline">Login</Button>
           </Link>
-          <Link href="/register">
-            <Button variant="outline">Register</Button>
-          </Link>
         </div>
       </nav>
     </div>
