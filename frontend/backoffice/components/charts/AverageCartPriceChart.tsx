@@ -24,7 +24,7 @@ export function AverageCartPriceChart({
   return (
     <Card className="">
       <CardHeader>
-        <CardTitle>Prix du panier moyen €</CardTitle>
+        <CardTitle>Average cart price €</CardTitle>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
