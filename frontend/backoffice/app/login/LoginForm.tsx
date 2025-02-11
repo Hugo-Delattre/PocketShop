@@ -25,10 +25,10 @@ export function LoginForm() {
       });
   };
   return (
-    <form onSubmit={onLogin}>
+    <form onSubmit={onLogin} className="space-y-6">
       <fieldset className="form-group">
         <input
-          className="form-control form-control-lg"
+          className="form-control form-control-lg w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
           type="text"
           placeholder="Username"
           name="username"
@@ -43,7 +43,7 @@ export function LoginForm() {
       </fieldset>
       <fieldset className="form-group">
         <input
-          className="form-control form-control-lg"
+          className="form-control form-control-lg w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
           type="password"
           placeholder="Password"
           autoComplete="off"
@@ -57,7 +57,7 @@ export function LoginForm() {
           }
         />
       </fieldset>
-      <button type="submit" className="btn btn-lg btn-primary pull-xs-right">
+      <button type="submit" className="btn btn-lg btn-primary pull-xs-right w-full py-2 px-4 bg-indigo-600 text-white rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
         Log in
       </button>
     </form>

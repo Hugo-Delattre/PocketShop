@@ -1,17 +1,8 @@
 import React from "react";
 import Link from "next/link";
-import {
-  Menubar,
-  MenubarContent,
-  MenubarItem,
-  MenubarMenu,
-  MenubarSeparator,
-  MenubarShortcut,
-  MenubarTrigger,
-} from "@/components/ui/menubar";
 import { Button } from "@/components/ui/button";
 
-function Navbar() {
+export default function Navbar() {
   return (
     <div className="bg-[#82bd69] p-4 flex justify-between items-center">
       <nav className="flex justify-between items-center w-full">
@@ -55,4 +46,4 @@ function Navbar() {
   );
 }
 
-export default Navbar;
+
