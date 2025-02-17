@@ -1,47 +1,42 @@
-"use client";
-
 import React from "react";
 
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
-import { Checkbox } from "@/components/ui/checkbox"
+import { Checkbox } from "@/components/ui/checkbox";
+import { User } from "@/lib/repositories/users/usersRepositories";
 
 export enum UserRole {
     USER = "user",
     ADMIN = "admin",
 }
 
-export type User = {
-    id: number;
-    first_name: string;
-    last_name: string;
-    username: string;
-    email: string;
-    password: string;
-    role: UserRole;
-};
-
 export const columns: ColumnDef<User>[] = [
     {
         id: "select",
         header: ({ table }) => (
-          <Checkbox
-            checked={
-              table.getIsAllPageRowsSelected() ||
-              (table.getIsSomePageRowsSelected() && "indeterminate")
-            }
-            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-            aria-label="Select all"
-          />
+            <Checkbox
+                checked={
+                    table.getIsAllPageRowsSelected() ||
+                    (table.getIsSomePageRowsSelected() && "indeterminate")
+                }
+                onCheckedChange={(value) =>
+                    table.toggleAllPageRowsSelected(!!value)
+                }
+                aria-label="Select all"
+            />
         ),
         cell: ({ row }) => (
-          <Checkbox
-            checked={row.getIsSelected()}
-            onCheckedChange={(value) => row.toggleSelected(!!value)}
-            aria-label="Select row"
-          />
+            <Checkbox
+                checked={row.getIsSelected()}
+                onCheckedChange={(value) => row.toggleSelected(!!value)}
+                aria-label="Select row"
+            />
         ),
-    },    
+    },
+    {
+        accessorKey: "id",
+        header: "ID",
+    },
     {
         accessorKey: "username",
         header: "Username",

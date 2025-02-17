@@ -25,6 +25,10 @@ export class OrderService {
     return this.orderRepository.findOne({ where: { id } });
   }
 
+  async findByUser(userId: number): Promise<Order[]> {
+    return this.orderRepository.find({ where: { user: { id: userId } } });
+  }
+
   async update(
     id: number,
     updateOrderDto: UpdateOrderDto,

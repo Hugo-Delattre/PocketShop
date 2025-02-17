@@ -11,7 +11,7 @@ import {
 } from "../ui/dropdown-menu";
 import { NavBarItem } from "./NavBarItem";
 
-function Navbar() {
+export default function Navbar() {
   return (
     <nav className="bg-blue flex flex-col justify-between items-center h-full w-full px-4 py-6">
       <ul className="space-y-2 w-full mt-24">
@@ -48,5 +48,3 @@ function Navbar() {
     </nav>
   );
 }
-
-export default Navbar;
