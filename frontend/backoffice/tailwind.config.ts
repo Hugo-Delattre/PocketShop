@@ -19,6 +19,9 @@ const config: Config = {
         crimson: ["var(--font-crimson)", ...fontFamily.mono],
       },
       colors: {
+        blue: "#0B132B",
+        lightBlue: "#0A2471",
+        transparentBlue: "#2B3A667D",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {

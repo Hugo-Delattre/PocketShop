@@ -1,49 +1,50 @@
 import React from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+
+import { buttonVariants } from "@/components/ui/button";
+import { CircleUserRoundIcon } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { NavBarItem } from "./NavBarItem";
 
 export default function Navbar() {
   return (
-    <div className="bg-[#82bd69] p-4 flex justify-between items-center">
-      <nav className="flex justify-between items-center w-full">
-        <ul className="flex space-x-4">
-          <li>
-            <Link href="/">
-              <p className="text-white hover:text-green-200 transition duration-1000 ease-in-out">
-                Home
-              </p>
-            </Link>
-          </li>
-          <li>
-            <Link href="/products">
-              <p className="text-white hover:text-green-200 transition duration-300 ease-in-out">
-                Products
-              </p>
-            </Link>
-          </li>
-          <li>
-            <Link href="/users">
-              <p className="text-white hover:text-green-200 transition duration-300 ease-in-out">
-                Users
-              </p>
-            </Link>
-          </li>
-          <li>
-            <Link href="/kpis">
-              <p className="text-white hover:text-green-200 transition duration-300 ease-in-out">
-                KPIS
-              </p>
-            </Link>
-          </li>
-        </ul>
-        <div className="flex space-x-4">
-          <Link href="/login">
-            <Button variant="outline">Login</Button>
-          </Link>
-        </div>
-      </nav>
-    </div>
+    <nav className="bg-blue flex flex-col justify-between items-center h-full w-full px-4 py-6">
+      <ul className="space-y-2 w-full mt-24">
+        <NavBarItem route="home" />
+        <NavBarItem route="users" />
+        <NavBarItem route="products" />
+        <NavBarItem route="kpis" />
+      </ul>
+      <div className="space-y-4 w-full">
+        <DropdownMenu>
+          <DropdownMenuTrigger className="grid place-items-center w-full aspect-square">
+            <CircleUserRoundIcon className="stroke-white w-7 h-7" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem>
+              <Link
+                href="/login"
+                className={buttonVariants({ variant: "ghost" })}
+              >
+                Login
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link
+                href="/register"
+                className={buttonVariants({ variant: "ghost" })}
+              >
+                Signup
+              </Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </nav>
   );
 }
-
-
