@@ -35,9 +35,9 @@ export function ProductsPage() {
   const handleSubmit = async (
     value: Partial<createProductType> | createProductType,
     isEditing: boolean,
-    selectedItemId: number
+    selectedItemId?: number
   ) => {
-    if (isEditing) {
+    if (isEditing && selectedItemId) {
       await updateProduct({
         productId: selectedItemId,
         product: {
@@ -49,6 +49,8 @@ export function ProductsPage() {
       });
       return;
     }
+    console.log(value);
+
     await createProduct(value as createProductType);
   };
 
@@ -94,7 +96,7 @@ export function ProductsPage() {
             isOpen={isOpen}
             setIsOpen={handleClose}
             onSubmit={(value) =>
-              handleSubmit(value, isEditing, selectedItem!.id)
+              handleSubmit(value, isEditing, selectedItem?.id)
             }
             isEditing={isEditing}
             selectedItem={{
