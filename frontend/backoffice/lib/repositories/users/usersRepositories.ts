@@ -15,20 +15,20 @@ export const postLogin = async ({ username, password }: postLoginParam) => {
 export const getUsers = async () => {
   return await apiClient({
     method: "get",
-    url: `/user`,
+    url: `/users`,
   });
 };
 export const getUser = async (id: number) => {
   return await apiClient({
     method: "get",
-    url: `/user/${id}`,
+    url: `/users/${id}`,
   });
 };
 
 export const createUser = async (user: User) => {
   return await apiClient({
     method: "post",
-    url: `/user`,
+    url: `/users`,
     data: user,
   });
 };
@@ -36,14 +36,14 @@ export const createUser = async (user: User) => {
 export const deleteUser = async (id: number) => {
   return await apiClient({
     method: "delete",
-    url: `/user/${id}`,
+    url: `/users/${id}`,
   });
 };
 
 export const updateUser = async (user: User) => {
   return await apiClient({
     method: "patch",
-    url: `/user/${user.id}`,
+    url: `/users/${user.id}`,
     data: user,
   });
 };
