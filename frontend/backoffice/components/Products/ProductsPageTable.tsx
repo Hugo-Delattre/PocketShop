@@ -16,6 +16,7 @@ import { columns } from "./data";
 import { UpdateCreateModal } from "./UpdateCreateModal";
 
 import { Table } from "../table/Table";
+import { Loader } from "../ui/loader";
 
 export function ProductsPage() {
   const [pagination, setPagination] = React.useState<PaginationState>({
@@ -49,28 +50,12 @@ export function ProductsPage() {
       });
       return;
     }
-    console.log(value);
 
     await createProduct(value as createProductType);
   };
 
   if (!data || isLoading) {
-    return (
-      <div className="grid place-items-center w-full h-full">
-        <svg
-          className="-ml-1 size-10 animate-spin text-white"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <path
-            className="opacity-75"
-            fill="black"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-          ></path>
-        </svg>
-      </div>
-    );
+    return <Loader />;
   }
 
   return (
@@ -81,7 +66,7 @@ export function ProductsPage() {
         pagination={pagination}
         setPagination={setPagination}
         columns={columns}
-        deleteProduct={async (selectedProductId) =>
+        deleteElement={async (selectedProductId) =>
           await deleteProduct(selectedProductId)
         }
         searchValue={(table) =>
