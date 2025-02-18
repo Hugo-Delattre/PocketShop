@@ -35,7 +35,7 @@ interface TableProps<ProductType extends { id: number }> {
     table: TypedTable<ProductType>
   ): void;
 
-  deleteProduct(selectedProductId: number): void;
+  deleteElement(selectedElementId: number): void;
 
   data: [ProductType[], number];
   columns: ColumnDef<ProductType, unknown>[];
@@ -61,7 +61,7 @@ export function Table<ProductType extends { id: number }>({
   columns,
   pagination,
   setPagination,
-  deleteProduct,
+  deleteElement,
   children,
 }: TableProps<ProductType>) {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -136,7 +136,7 @@ export function Table<ProductType extends { id: number }>({
             <PlusCircleIcon />
           </Button>
           <Button
-            onClick={async () => await deleteProduct(selectedItemId)}
+            onClick={async () => await deleteElement(selectedItemId)}
             variant="destructive"
             disabled={!isAnyRowSelected}
           >
@@ -163,8 +163,11 @@ export function Table<ProductType extends { id: number }>({
                   />
                 </TableHead>
                 {headerGroup.headers.map((header) => {
+                  const w = header.column.getSize();
+
                   return (
                     <TableHead
+                      style={{ width: w }}
                       key={header.id}
                       className="last-of-type:rounded-tr-lg last-of-type:rounded-br-lg"
                     >
@@ -195,8 +198,16 @@ export function Table<ProductType extends { id: number }>({
                     />
                   </TableCell>
                   {row.getVisibleCells().map((cell) => {
+                    const value = cell.getValue();
+
+                    const titleValue =
+                      typeof value === "string" ? value || "" : "";
                     return (
-                      <TableCell key={cell.id}>
+                      <TableCell
+                        key={cell.id}
+                        className="text-ellipsis overflow-hidden"
+                        title={titleValue}
+                      >
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()

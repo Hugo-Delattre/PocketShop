@@ -34,7 +34,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "tailwind.config.ts"
-  ],
+, "components/BackButton"  ],
   "exclude": [
     "node_modules"
   ]

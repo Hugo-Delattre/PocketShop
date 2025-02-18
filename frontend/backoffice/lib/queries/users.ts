@@ -8,10 +8,18 @@ import {
   updateUser,
 } from "../repositories/users/usersRepositories";
 
-export function useGetUsers() {
+export function useGetUsers(queryPagination?: {
+  skip?: number;
+  take?: number;
+}) {
   return useQuery<User[]>({
-    queryKey: ["getUser"],
-    queryFn: () => getUsers().then((res) => res.data),
+    queryKey: [
+      "getUsers",
+      `skip: ${queryPagination?.skip}`,
+      `take: ${queryPagination?.take}`,
+    ],
+    staleTime: 20000,
+    queryFn: () => getUsers(queryPagination ?? {}).then((res) => res.data),
   });
 }
 
@@ -44,7 +52,6 @@ export const useUpdateUser = () => {
     },
   });
 };
-
 
 export const useDeleteUser = () => {
   const queryClient = useQueryClient();

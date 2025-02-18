@@ -15,7 +15,7 @@ const routes = {
     icon: HomeIcon,
   },
   users: {
-    path: "users",
+    path: "/users",
     icon: UsersIcon,
   },
   products: {
