@@ -20,6 +20,7 @@ import {
 import { Audio } from "expo-av";
 import useProductApi from "@/hooks/api/product";
 import { router, usePathname, useRouter, useSegments } from "expo-router";
+import React from "react";
 
 export default function App() {
   const [facing, setFacing] = useState<CameraType>("back");

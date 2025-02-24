@@ -6,15 +6,17 @@ import {
   View,
   SafeAreaView,
 } from "react-native";
-import { Product } from "@/constants/interface/Product";
+import { ProductInShop } from "@/constants/interface/Product";
 import React, { useState, useEffect, Fragment } from "react";
 import useCartApi from "@/hooks/api/cart";
 import { ScrollView } from "react-native";
 import Icon from "@rneui/themed/dist/Icon";
 import ProductCard from "@/components/custom/ProductCart";
 import { CartResponseDao } from "@/constants/interface/Cart";
+import { usePathname } from "expo-router";
 export default function Cart() {
   const [cart, setCart] = useState<CartResponseDao>();
+  const path = usePathname();
   const { getCart, loading } = useCartApi();
   useEffect(() => {
     const fetchCart = async () => {
@@ -25,7 +27,7 @@ export default function Cart() {
       setCart(cart);
     };
     fetchCart();
-  }, []);
+  }, [path]);
   return (
     <SafeAreaView>
       <View style={styles.container}>
@@ -38,7 +40,7 @@ export default function Cart() {
             {cart?.products.length} differents products for{" "}
           </Text>
           <Text style={styles.headerPrice}>
-            <Text style={styles.totalPrice}> 30.00 €</Text>
+            <Text style={styles.totalPrice}>{cart?.totalPrice} €</Text>
           </Text>
         </View>
       </View>
@@ -48,13 +50,19 @@ export default function Cart() {
             <Fragment>loading..</Fragment>
           ) : (
             cart?.products.map((product) => {
-              return <ProductCard product={product} />;
+              return (
+                <ProductCard
+                  key={product.code}
+                  productData={product}
+                  orderId={cart.orderId}
+                />
+              );
             })
           )}
         </ScrollView>
       </View>
       <View style={styles.payArea}>
-        <Text style={styles.checkoutText}>Checkout 30.00 €</Text>
+        <Text style={styles.checkoutText}>Checkout {cart?.totalPrice}</Text>
         <TouchableOpacity
           style={styles.paypal}
           onPress={() => console.log("remove")}

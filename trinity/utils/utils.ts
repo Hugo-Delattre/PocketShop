@@ -3,8 +3,8 @@ const apiBaseUrl = process.env.EXPO_PUBLIC_API_URL;
 export default async function getJwtToken() {
   // console.log("Getting JWT token");
   const creds = JSON.stringify({
-    username: "admin",
-    password: "Admin1!",
+    username: "louis",
+    password: "Password1!",
   });
   const response = await fetch(apiBaseUrl + "/auth/login", {
     method: "POST",

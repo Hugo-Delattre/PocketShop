@@ -1,4 +1,3 @@
-import { Product } from "@/constants/interface/Product";
 import { Icon } from "@rneui/base";
 import {
   SafeAreaView,
@@ -9,37 +8,56 @@ import {
 } from "react-native";
 import { ThemedText } from "../ThemedText";
 import { CartInfo } from "@/constants/interface/Cart";
+import useCartApi, { AddPayload, removePayload } from "@/hooks/api/cart";
+import React from "react";
 
-const ProductCard = ({ product: cartInfo }: { product: CartInfo }) => {
-  // console.log("product", cartInfo.product.name);
+interface ProductCartProps {
+  productData: CartInfo;
+  orderId: number;
+}
+const ProductCard = (props: ProductCartProps) => {
+  console.log("PRODUCT IN CART", props.productData.code);
+  const { addToCart, removeFromCart } = useCartApi();
+  const addPayload: AddPayload = {
+    productId: props.productData.code,
+    shopId: "1",
+    userId: "1",
+  };
+  const removePayload: removePayload = {
+    productId: Number(props.productData.product.id),
+    orderId: Number(props.orderId),
+    shopId: 1, //TODO
+  };
   return (
     <SafeAreaView>
-      <View key={cartInfo.product.id} style={styles.productCard}>
+      <View key={props.productData.product.id} style={styles.productCard}>
         <Image
           source={{
-            uri: cartInfo.product.image_url,
+            uri: props.productData.product.image_url,
           }}
           style={styles.productImage}
         />
         <View style={styles.cardInfo}>
           <ThemedText numberOfLines={3} ellipsizeMode="tail">
-            {cartInfo.product.name}
+            {props.productData.product.product_name_fr}
           </ThemedText>
           <View style={{ flexDirection: "row" }}>
-            <ThemedText style={styles.price}>{cartInfo.price} €</ThemedText>
+            <ThemedText style={styles.price}>
+              {props.productData.price} €
+            </ThemedText>
             <View style={styles.quantity}>
               <TouchableOpacity
                 style={styles.btnRemove}
-                onPress={() => console.log("remove")}
+                onPress={() => removeFromCart(removePayload)}
               >
                 <Icon name={"remove"} size={15} color="white" />
               </TouchableOpacity>
               <ThemedText style={styles.quantityText}>
-                {cartInfo.availableQuantity}
+                {props.productData.selectedQuantity}
               </ThemedText>
               <TouchableOpacity
                 style={styles.btnAdd}
-                onPress={() => console.log("add")}
+                onPress={() => addToCart(addPayload)}
               >
                 <Icon name={"add"} size={15} color="white" />
               </TouchableOpacity>

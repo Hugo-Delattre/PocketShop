@@ -1,5 +1,5 @@
 export interface Nutriments {
-  "energy-kcal": number;
+  'energy-kcal': number;
   fat: number;
   fiber: number;
   proteins: number;
@@ -9,10 +9,8 @@ export interface Nutriments {
   sodium: number;
 }
 
-export interface Product {
+export interface ProductOFF {
   id: string;
-
-  code: string;
   name: string;
   brands: string;
   product_name_fr: string;
@@ -25,7 +23,15 @@ export interface Product {
   image_url: string;
   quantity: string;
   nutriments: Nutriments;
+}
+
+export interface ProductInShop {
+
+  code: string;
   available: boolean;
   availableQuantity: number;
   price: number;
+
+  product: ProductOFF;
+  
 }
