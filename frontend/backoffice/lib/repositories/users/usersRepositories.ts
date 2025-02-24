@@ -70,3 +70,5 @@ export type User = {
   password: string;
   role: UserRole;
 };
+
+export type ClientSideUser = Omit<User, "password">;

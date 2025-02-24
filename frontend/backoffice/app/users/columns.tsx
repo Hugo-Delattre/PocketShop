@@ -2,14 +2,9 @@ import React from "react";
 
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
-import { User } from "@/lib/repositories/users/usersRepositories";
+import { ClientSideUser } from "@/lib/repositories/users/usersRepositories";
 
-export enum UserRole {
-  USER = "user",
-  ADMIN = "admin",
-}
-
-export const columns: ColumnDef<User>[] = [
+export const columns: ColumnDef<ClientSideUser>[] = [
   {
     accessorKey: "username",
     header: "Username",

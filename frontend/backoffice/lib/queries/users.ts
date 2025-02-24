@@ -12,7 +12,7 @@ export function useGetUsers(queryPagination?: {
   skip?: number;
   take?: number;
 }) {
-  return useQuery<User[]>({
+  return useQuery<[User[], number]>({
     queryKey: [
       "getUsers",
       `skip: ${queryPagination?.skip}`,

@@ -8,10 +8,12 @@ export type CartType = {
     available: boolean;
     availableQuantity: number;
     price: string;
-    product: unknown;
+    product: { image_url: string };
     code: string;
     status: string;
     status_verbose: string;
+    selectedQuantity: number;
+    priceAtOrder: number;
   }[];
   total_price: string;
   creation_date: Date;

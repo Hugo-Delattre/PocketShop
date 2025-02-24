@@ -9,16 +9,22 @@ import {
 } from "@/lib/queries/users";
 import type { PaginationState } from "@tanstack/react-table";
 import { useState } from "react";
-import UpdateCreateUserModal from "./UpdateCreateUserModale";
-import { User } from "@/lib/repositories/users/usersRepositories";
+import UpdateCreateUserModal, { ModalUser } from "./UpdateCreateUserModale";
+import {
+  ClientSideUser,
+  User,
+  UserRole,
+} from "@/lib/repositories/users/usersRepositories";
 import { Loader } from "@/components/ui/loader";
+import { Error } from "@/components/ui/error";
+import { AxiosError } from "axios";
 
 export default function UserPage() {
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 5,
   });
-  const { data, isLoading } = useGetUsers({
+  const { data, isLoading, error } = useGetUsers({
     skip: pagination.pageIndex * pagination.pageSize,
     take: pagination.pageSize,
   });
@@ -27,15 +33,23 @@ export default function UserPage() {
   const { mutateAsync: createUser } = useCreateUser();
   const { mutateAsync: updateUser } = useUpdateUser();
 
+  if (error) {
+    return <Error error={error as AxiosError} />;
+  }
+
   if (!data || isLoading) {
     return <Loader />;
   }
 
   const handleSubmit = async (
-    value: Partial<User>,
+    value: ModalUser,
     isEditing: boolean,
     selectedItemId?: number
   ) => {
+    if (value.password === "") {
+      // @ts-expect-error louis
+      delete value.password;
+    }
     if (isEditing && selectedItemId) {
       const updateUserObj = {
         ...value,
@@ -52,7 +66,7 @@ export default function UserPage() {
   return (
     <div className="w-5/6 mx-auto pt-14">
       <h1 className="font-crimson text-4xl mb-6">Users</h1>
-      <Table<User>
+      <Table<ClientSideUser>
         data={data}
         pagination={pagination}
         setPagination={setPagination}
@@ -78,6 +92,8 @@ export default function UserPage() {
               last_name: selectedItem?.last_name || "",
               email: selectedItem?.email || "'",
               username: selectedItem?.username || "",
+              role: selectedItem?.role || UserRole.USER,
+              password: "",
             }}
           />
         )}
