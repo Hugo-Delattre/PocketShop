@@ -4,13 +4,11 @@ function Layout({
   modals,
   children,
 }: PropsWithChildren & { modals: React.ReactNode }) {
-  console.log(modals);
-
   return (
-    <div>
+    <>
       <div>{modals}</div>
       {children}
-    </div>
+    </>
   );
 }
 

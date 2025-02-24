@@ -17,7 +17,6 @@ export function CartDisplay({ userId }: { userId: number }) {
   if (!data) {
     return <p>User have no cart</p>;
   }
-  console.log(data);
 
   return (
     <div>
@@ -25,7 +24,11 @@ export function CartDisplay({ userId }: { userId: number }) {
         ({ product: { image_url }, selectedQuantity, priceAtOrder }, i) => (
           <div key={i} className="flex gap-4">
             <div className="w-20 aspect-video overflow-hidden">
-              <img className="object-contain w-full h-full" src={image_url} />
+              <img
+                className="object-contain w-full h-full"
+                src={image_url}
+                alt="product image"
+              />
             </div>
             <p>x {selectedQuantity}</p>
             <p>

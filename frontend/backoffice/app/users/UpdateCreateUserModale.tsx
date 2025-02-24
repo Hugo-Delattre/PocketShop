@@ -8,10 +8,21 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { User } from "@/lib/repositories/users/usersRepositories";
+
+import { User, UserRole } from "@/lib/repositories/users/usersRepositories";
 import { useMemo, useState } from "react";
 
-type ModalUser = Omit<User, "id">;
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import token from "@/lib/token";
+import { jwtConstants } from "@/utils/jwt";
+
+export type ModalUser = Omit<User, "id">;
 
 interface UpdateCreateModalProps {
   isOpen?: boolean;
@@ -27,6 +38,7 @@ const defaultValue: ModalUser = {
   first_name: "",
   last_name: "",
   password: "",
+  role: UserRole.USER,
 };
 
 export default function UpdateCreateUserModal({
@@ -36,11 +48,13 @@ export default function UpdateCreateUserModal({
   onSubmit,
   isEditing,
 }: UpdateCreateModalProps) {
-  console.log(selectedItem);
-
   const [formItem, setFormItem] = useState<ModalUser>(
     selectedItem ?? defaultValue
   );
+
+  const { role } = token.decodeToken(jwtConstants.key);
+
+  const isAdmin = role === UserRole["ADMIN"];
 
   useMemo(() => {
     setFormItem(selectedItem ?? defaultValue);
@@ -120,6 +134,31 @@ export default function UpdateCreateUserModal({
               }
             />
           </div>
+          {isAdmin && (
+            <div className="">
+              <Label htmlFor="role" className="text-right">
+                Role
+              </Label>
+              <Select
+                name="role"
+                value={formItem.role}
+                onValueChange={(v) =>
+                  setFormItem((prev) => ({
+                    ...prev,
+                    role: v as UserRole,
+                  }))
+                }
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={UserRole.USER}>User</SelectItem>
+                  <SelectItem value={UserRole.ADMIN}>Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           <div className="">
             <Label htmlFor="password" className="text-right">
               Password

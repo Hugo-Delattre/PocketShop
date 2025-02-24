@@ -11,6 +11,8 @@ import {
 } from "../ui/dropdown-menu";
 import { NavBarItem } from "./NavBarItem";
 
+import { NavbarLogOut } from "./navbarLogOut";
+
 export default function Navbar() {
   return (
     <nav className="bg-blue flex flex-col justify-between items-center h-full w-full px-4 py-6">
@@ -41,6 +43,9 @@ export default function Navbar() {
               >
                 Signup
               </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <NavbarLogOut />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
