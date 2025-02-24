@@ -3,28 +3,11 @@ import { ShopService } from './shop.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Shop } from './entities/shop.entity';
 import { Repository } from 'typeorm';
+import { mockShop, mockShopRepository } from './test-data';
 
 describe('ShopService', () => {
   let service: ShopService;
   let repository: Repository<Shop>;
-
-  const mockShop = {
-    id: 1,
-    name: 'Test Shop',
-    address: 'Test Address',
-    zip_code: 31000,
-    city: 'Test City',
-    country: 'Test Country',
-  };
-
-  const mockRepository = {
-    create: jest.fn().mockReturnValue(mockShop),
-    save: jest.fn().mockResolvedValue(mockShop),
-    find: jest.fn().mockResolvedValue([mockShop]),
-    findOne: jest.fn().mockResolvedValue(mockShop),
-    update: jest.fn().mockResolvedValue(true),
-    delete: jest.fn().mockResolvedValue(true),
-  };
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -33,7 +16,7 @@ describe('ShopService', () => {
         ShopService,
         {
           provide: getRepositoryToken(Shop),
-          useValue: mockRepository,
+          useValue: mockShopRepository,
         },
       ],
     }).compile();

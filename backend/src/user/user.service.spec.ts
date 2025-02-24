@@ -15,13 +15,16 @@ describe('UserService', () => {
     username: 'johndoe',
     email: 'john@example.com',
     password: 'hashedPassword123',
+    creation_date: new Date(),
   };
 
   const mockRepository = {
     create: jest.fn().mockReturnValue(mockUser),
     save: jest.fn().mockResolvedValue(mockUser),
     find: jest.fn().mockResolvedValue([mockUser]),
+    findAndCount: jest.fn().mockResolvedValue([[mockUser], 1]),
     findOne: jest.fn().mockResolvedValue(mockUser),
+    findOneBy: jest.fn().mockResolvedValue(mockUser),
     update: jest.fn().mockResolvedValue({ affected: 1 }),
     delete: jest.fn().mockResolvedValue({ affected: 1 }),
   };
@@ -60,7 +63,7 @@ describe('UserService', () => {
 
   describe('findAllUser', () => {
     it('should return array of users', async () => {
-      expect(await service.findAllUser()).toEqual([mockUser]);
+      expect(await service.findAllUser(1, 0)).toEqual([[mockUser], 1]);
     });
   });
 
@@ -70,7 +73,7 @@ describe('UserService', () => {
     });
 
     it('should handle user not found', async () => {
-      jest.spyOn(repository, 'findOne').mockResolvedValue(null);
+      jest.spyOn(repository, 'findOneBy').mockResolvedValue(null);
       await expect(service.viewUser(999)).rejects.toThrow();
     });
   });

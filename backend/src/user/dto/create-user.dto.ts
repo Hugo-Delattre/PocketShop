@@ -9,7 +9,7 @@ import {
 } from 'class-validator';
 
 const passwordRegEx =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*d)(?=.*[@$!%*?&])[A-Za-zd@$!%*?&]{8,20}$/;
+  /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-\?])(?=.*[a-z]).{8,20}$/;
 
 export class CreateUserDto {
   @ApiProperty({
@@ -42,7 +42,7 @@ export class CreateUserDto {
     example: 'louis@yalink.fr',
   })
   @IsNotEmpty()
-  @IsEmail(null, { message: 'Please provide valid Email.' })
+  @IsEmail(undefined, { message: 'Please provide valid Email.' })
   email: string;
 
   @ApiProperty({

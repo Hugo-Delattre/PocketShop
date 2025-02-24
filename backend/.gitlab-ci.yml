@@ -6,8 +6,8 @@ stages:
 
 variables:
   DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: "/certs"
-  DOCKER_HOST: "unix:///var/run/docker.sock"
+  DOCKER_TLS_CERTDIR: '/certs'
+  DOCKER_HOST: 'unix:///var/run/docker.sock'
 
 services:
   - name: docker:24.0.5-dind
@@ -51,7 +51,7 @@ test:
     POSTGRES_USER: $PG_USER
     POSTGRES_PASSWORD: $PG_PASSWORD
     POSTGRES_DB: $PG_DB
-    DOCKER_HOST: "unix:///runner/services/docker/docker.sock"
+    DOCKER_HOST: 'unix:///runner/services/docker/docker.sock'
   services:
     - docker:24.0.5-dind
     - name: postgres:16
@@ -69,7 +69,7 @@ test:
     - doppler run --config dev -- docker-compose up -d db
   script:
     - doppler run --config dev -- npm ci
-    - doppler run --config dev -- npm run test
+    - doppler run --config dev -- npm run test:cov
   after_script:
     - docker-compose down -v
   only:
@@ -78,7 +78,6 @@ test:
   tags:
     - docker
   # when: always
-
 
 deploy:
   stage: deploy

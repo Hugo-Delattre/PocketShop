@@ -2,6 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import { config } from 'dotenv';
+
+config({ path: '.env.local' });
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,7 +15,14 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  const allowedOrigins = ['http://localhost:3000', 'http://localhost:8080', 'http://localhost:1234'];
+  const allowedOrigins = [
+    'http://localhost:3000',
+    'http://localhost:8080',
+    'http://localhost:3002',
+    'http://209.38.247.123:3000',
+    'http://209.38.247.123:8080',
+    'http://209.38.247.123:3002',
+  ];
   app.enableCors({
     origin: (origin, callback) => {
       if (!origin || allowedOrigins.includes(origin)) {

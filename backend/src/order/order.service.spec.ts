@@ -3,12 +3,16 @@ import { OrderService } from './order.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
 import { Repository } from 'typeorm';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
+import { PaypalService } from '../paypal/paypal.service';
+import { UpdateOrderDto } from 'src/order/dto/update-order.dto';
+import { CreateOrderDto } from 'src/order/dto/create-order.dto';
+import { ConfigService } from '@nestjs/config';
 
 describe('OrderService', () => {
   let service: OrderService;
   let repository: Repository<Order>;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  let paypalService: PaypalService;
 
   const mockOrder = {
     id: 1,
@@ -20,13 +24,29 @@ describe('OrderService', () => {
     billingId: 1,
   };
 
+  const mockPaypalService = {
+    createPaypalOrder: jest.fn().mockResolvedValue({
+      id: 'MOCK_PAYPAL_ID',
+      status: 'CREATED',
+    }),
+    capturePaypalOrder: jest.fn().mockResolvedValue({
+      id: 'MOCK_PAYPAL_ID',
+      status: 'COMPLETED',
+    }),
+  };
+
   const mockRepository = {
     create: jest.fn().mockReturnValue(mockOrder),
     save: jest.fn().mockResolvedValue(mockOrder),
     find: jest.fn().mockResolvedValue([mockOrder]),
     findOne: jest.fn().mockResolvedValue(mockOrder),
-    update: jest.fn().mockResolvedValue({ affected: 1 }),
+    findOneBy: jest.fn().mockResolvedValue(mockOrder),
+    update: jest.fn().mockResolvedValue(mockOrder),
     delete: jest.fn().mockResolvedValue({ affected: 1 }),
+  };
+  const mockRepositoryPaypal = {
+    createPaypalOrder: jest.fn().mockResolvedValue({}),
+    capturePaypalOrder: jest.fn().mockResolvedValue({}),
   };
 
   beforeEach(async () => {
@@ -34,13 +54,32 @@ describe('OrderService', () => {
       providers: [
         OrderService,
         {
+          provide: PaypalService,
+          useValue: mockPaypalService,
+        },
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn((key: string) => {
+              if (key === 'PAYPAL_CLIENT_ID') return 'mockClientId';
+              if (key === 'PAYPAL_CLIENT_SECRET') return 'mockClientSecret';
+              return null;
+            }),
+          },
+        },
+        {
           provide: getRepositoryToken(Order),
           useValue: mockRepository,
+        },
+        {
+          provide: PaypalService,
+          useValue: mockRepositoryPaypal,
         },
       ],
     }).compile();
 
     service = module.get<OrderService>(OrderService);
+    paypalService = module.get<PaypalService>(PaypalService);
     repository = module.get<Repository<Order>>(getRepositoryToken(Order));
   });
 

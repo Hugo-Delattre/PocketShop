@@ -5,10 +5,15 @@ export class CreateProductDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  open_food_fact_id: string;
+  openFoodFactId: string;
 
   @ApiProperty()
   @IsNumber()
   @IsNotEmpty()
-  shopId: number;
+  quantity: number;
+
+  @ApiProperty()
+  @IsNumber()
+  @IsNotEmpty()
+  price: number;
 }
