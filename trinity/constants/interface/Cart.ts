@@ -1,13 +1,14 @@
-import { Product } from "./Product";
+import { ProductInShop } from "./Product";
 
 export interface CartResponseDao {
   products: Array<CartInfo>;
   orderId: number;
   userId: number;
+  totalPrice: string;
 }
 
 export interface CartInfo {
-  product: Product;
+  productInShop: ProductInShop;
   code: string;
   status: string;
   status_verbose: string;

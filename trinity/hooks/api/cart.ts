@@ -3,7 +3,7 @@ import { useState } from "react";
 import getJwt from "@/utils/utils";
 import { CartResponseDao } from "@/constants/interface/Cart";
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL + "/carts";
-
+const INVOICE_URL = process.env.EXPO_PUBLIC_API_URL + "/invoices";
 type AddPayload = {
   productId: string;
   shopId: string;
@@ -85,6 +85,8 @@ const useCartApi = () => {
         );
       }
       const result = await response.json();
+      const price = getTotalPriceByCart(userId, result.orderId);
+      result.totalPrice = price;
       return result;
     } catch (err) {
       setError(err as Error);
@@ -93,7 +95,33 @@ const useCartApi = () => {
       setLoading(false);
     }
   };
-
+  const getTotalPriceByCart = async (userId: number, orderId: number): Promise<Number> => {
+    setLoading(true);
+    const jwtToken = await getJwt();
+    setJwtToken(jwtToken);
+    try {
+      const response = await fetch(`${INVOICE_URL}/${userId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + jwtToken,
+        },
+      });
+      if (!response.ok) {
+        console.error("Error while fetching cart");
+        throw new Error(
+          "Error while fetching cart" + " " + response.statusText
+        );
+      }
+      const result = await response.json();
+      return result.total_price;
+    } catch (err) {
+      setError(err as Error);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }
   return { data, loading, error, addToCart, getCart, removeFromCart };
 };
 export default useCartApi;

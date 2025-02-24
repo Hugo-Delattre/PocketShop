@@ -1,4 +1,3 @@
-import { Product } from "@/constants/interface/Product";
 import { Icon } from "@rneui/base";
 import {
   SafeAreaView,
@@ -14,16 +13,16 @@ const ProductCard = ({ product: cartInfo }: { product: CartInfo }) => {
   // console.log("product", cartInfo.product.name);
   return (
     <SafeAreaView>
-      <View key={cartInfo.product.id} style={styles.productCard}>
+      <View key={cartInfo.productInShop.code} style={styles.productCard}>
         <Image
           source={{
-            uri: cartInfo.product.image_url,
+            uri: cartInfo.productInShop.product.image_url,
           }}
           style={styles.productImage}
         />
         <View style={styles.cardInfo}>
           <ThemedText numberOfLines={3} ellipsizeMode="tail">
-            {cartInfo.product.name}
+            {cartInfo.productInShop.product.product_name_fr}
           </ThemedText>
           <View style={{ flexDirection: "row" }}>
             <ThemedText style={styles.price}>{cartInfo.price} €</ThemedText>
