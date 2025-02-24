@@ -80,7 +80,7 @@ const useCartApi = () => {
         console.error("Error while fetching cart" + response);
       }
       const result = await response.json();
-      const price = getTotalPriceByCart(userId, result.orderId);
+      const price = getTotalPriceByCart(result.orderId);
       result.totalPrice = price;
       return result;
     } catch (err) {
@@ -90,7 +90,7 @@ const useCartApi = () => {
       setLoading(false);
     }
   };
-  const getTotalPriceByCart = async (userId: number, orderId: number): Promise<Number> => {
+  const getTotalPriceByCart = async (orderId: number): Promise<Number> => {
     setLoading(true);
     const jwtToken = await getJwt();
     setJwtToken(jwtToken);

@@ -15,34 +15,36 @@ interface ProductCartProps {
   productData: CartInfo;
   orderId: number;
 }
-const ProductCard = ({ productData }: ProductCartProps) => {
-  console.log("PRODUCT IN CART", productData);
+const ProductCard = (props: ProductCartProps) => {
+  console.log("PRODUCT IN CART", props.productData.code);
   const { addToCart, removeFromCart } = useCartApi();
   const addPayload: AddPayload = {
-    productId: productData.code,
+    productId: props.productData.code,
     shopId: "1",
     userId: "1",
   };
   const removePayload: removePayload = {
-    productId: Number(productData.code),
-    orderId: Number(orderId),
+    productId: Number(props.productData.product.id),
+    orderId: Number(props.orderId),
     shopId: 1, //TODO
   };
   return (
     <SafeAreaView>
-      <View key={productData.product.id} style={styles.productCard}>
+      <View key={props.productData.product.id} style={styles.productCard}>
         <Image
           source={{
-            uri: productData.product.image_url,
+            uri: props.productData.product.image_url,
           }}
           style={styles.productImage}
         />
         <View style={styles.cardInfo}>
           <ThemedText numberOfLines={3} ellipsizeMode="tail">
-            {productData.product.product_name_fr}
+            {props.productData.product.product_name_fr}
           </ThemedText>
           <View style={{ flexDirection: "row" }}>
-            <ThemedText style={styles.price}>{productData.price} €</ThemedText>
+            <ThemedText style={styles.price}>
+              {props.productData.price} €
+            </ThemedText>
             <View style={styles.quantity}>
               <TouchableOpacity
                 style={styles.btnRemove}
@@ -51,7 +53,7 @@ const ProductCard = ({ productData }: ProductCartProps) => {
                 <Icon name={"remove"} size={15} color="white" />
               </TouchableOpacity>
               <ThemedText style={styles.quantityText}>
-                {productData.selectedQuantity}
+                {props.productData.selectedQuantity}
               </ThemedText>
               <TouchableOpacity
                 style={styles.btnAdd}

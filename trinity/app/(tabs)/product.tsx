@@ -145,7 +145,11 @@ export default function ProductScreen() {
           color={"#0B132B"}
           title="Add to Cart"
           onPress={() => {
-            console.log("Adding to cart", productInShop.code);
+            console.log("Adding to cart", {
+              productId: productInShop.code,
+              shopId: "1",
+              userId: "1",
+            });
             addToCart({
               productId: productInShop.code,
               shopId: "1",
