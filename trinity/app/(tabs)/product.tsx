@@ -1,4 +1,4 @@
-import { Product, ProductInShop } from "@/constants/interface/Product";
+import { ProductInShop } from "@/constants/interface/Product";
 import {
   CameraView,
   CameraType,
@@ -27,34 +27,32 @@ import { Ionicons } from "@expo/vector-icons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { ScrollView } from "react-native";
 import useCartApi from "@/hooks/api/cart";
+import React from "react";
 export default function ProductScreen() {
   const router = useRouter();
   const { addToCart, removeFromCart } = useCartApi();
   const params = useLocalSearchParams();
   const { getProduct, loading } = useProductApi();
-  const [product, setProduct] = useState<Product | null>(null);
-  const [bipSound, setBipSound] = useState<Audio.Sound | null>(null);
+  const [productInShop, setProductShop] = useState<ProductInShop | null>(null);
 
   // from string | string[] to string
   const productId = Array.isArray(params?.productId)
     ? params.productId[0]
     : params?.productId;
-
   useEffect(() => {
     const fetchProduct = async () => {
       const productData = await getProduct(productId);
-      // console.log("Product Data", productData);
+      console.log("Product Data", productData);
 
       if (productData) {
-        //TODO: remove this .product after fixing the API
-        setProduct(productData);
+        setProductShop(productData);
       }
     };
 
     fetchProduct();
   }, [productId]);
 
-  if (loading || !product) {
+  if (loading || !productInShop) {
     return (
       <SafeAreaView style={styles.container}>
         <Text style={styles.message}>Loading...</Text>
@@ -63,40 +61,24 @@ export default function ProductScreen() {
   }
 
   // FOR TESTING PURPOSE
-  const productDataTest: ProductInShop = {
-    available: true,
-    availableQuantity: Math.trunc(Math.random() * 100),
-    price: 2.99,
-    testNutriments: {
-      "energy-kcal": 160,
-      fat: 10,
-      carbohydrates: 20,
-      fiber: 5,
-      proteins: 5,
-      salt: 0.1,
-      sugars: 10,
-      sodium: 0.1,
-    },
-    ...product,
-  };
 
   //END TEST
   return (
     <SafeAreaView>
       <View style={styles.container}>
         <Text numberOfLines={2} ellipsizeMode="clip" style={styles.screenTitle}>
-          {product?.product_name_fr !== ""
-            ? product.product_name_fr
-            : product?.name}
+          {productInShop.product?.product_name_fr !== ""
+            ? productInShop.product.product_name_fr
+            : productInShop.product?.name}
           {" - "}
-          {product?.brands}
+          {productInShop.product?.brands}
         </Text>
       </View>
       <View style={styles.productCard}>
         <Image
           source={{
-            uri: product?.image_url
-              ? product.image_url
+            uri: productInShop.product?.image_url
+              ? productInShop.product.image_url
               : "https://www.granitz.fr/images/image-not-found.jpg",
           }}
           style={styles.productImage}
@@ -140,8 +122,8 @@ export default function ProductScreen() {
           <CardDivider />
 
           <ScrollView style={{ height: 125, padding: 10 }}>
-            {productDataTest?.testNutriments &&
-              Object.entries(productDataTest.testNutriments).map(
+            {productInShop.product?.nutriments &&
+              Object.entries(productInShop.product.nutriments).map(
                 ([key, value]) => (
                   <View
                     key={key}
@@ -163,16 +145,16 @@ export default function ProductScreen() {
           color={"#0B132B"}
           title="Add to Cart"
           onPress={() => {
-            console.log("Adding to cart", product.code);
+            console.log("Adding to cart", productInShop.code);
             addToCart({
-              productId: product.code,
+              productId: productInShop.code,
               shopId: "1",
               userId: "1",
             });
           }}
           radius={5}
         >
-          <Text style={styles.price}>{productDataTest.price} €</Text>
+          <Text style={styles.price}>{productInShop.price} €</Text>
           <FontAwesome name="cart-arrow-down" size={20} color="white" />
         </Button>
       </View>

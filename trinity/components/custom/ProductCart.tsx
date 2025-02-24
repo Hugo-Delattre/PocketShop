@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { ThemedText } from "../ThemedText";
 import { CartInfo } from "@/constants/interface/Cart";
-
+import React from "react";
 const ProductCard = ({ product: cartInfo }: { product: CartInfo }) => {
   // console.log("product", cartInfo.product.name);
   return (
