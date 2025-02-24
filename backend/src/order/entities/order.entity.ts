@@ -27,6 +27,12 @@ export class Order {
   @Column()
   is_paid: boolean;
 
+  @Column({ nullable: true })
+  paypal_order_id: string;
+
+  @Column({ nullable: true })
+  paypal_status: string;
+
   @ManyToOne(() => User)
   @JoinColumn({ name: 'user_id' })
   user: User;

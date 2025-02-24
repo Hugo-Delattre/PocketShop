@@ -11,6 +11,7 @@ import InventorySeeder from './inventory.seeder';
 import { inventoryFactory } from 'database/factories/inventory.factory';
 import OrderSeeder from './order.seeder';
 import OrderLineSeeder from './orderline.seeder';
+import KpiSeeder from './kpi.seeder';
 
 export default class InitSeeder implements Seeder {
   public async run(dataSource: DataSource): Promise<any> {
@@ -23,6 +24,7 @@ export default class InitSeeder implements Seeder {
         InventorySeeder,
         OrderSeeder,
         OrderLineSeeder,
+        KpiSeeder,
       ],
       factories: [userFactory, billingDetailsFactory, inventoryFactory],
     });

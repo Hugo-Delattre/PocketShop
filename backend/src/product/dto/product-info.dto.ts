@@ -1,16 +1,16 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+export interface Nutriments {
+  'energy-kcal': number;
+  fat: number;
+  fiber: number;
+  proteins: number;
+  salt: number;
+  sugars: number;
+  carbohydrates: number;
+  sodium: number;
+}
 
-export class ProductInfoDto {
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  open_food_fact_id: string;
-
-  @ApiProperty()
-  @IsNumber()
-  @IsNotEmpty()
-  shopId: number;
+export interface ProductOFF {
+  id: string;
   name: string;
   brands: string;
   product_name_fr: string;
@@ -22,4 +22,11 @@ export class ProductInfoDto {
   allergens: string[];
   image_url: string;
   quantity: string;
+  nutriments: Nutriments;
+}
+
+export interface ProductInShop extends ProductOFF {
+  available: boolean;
+  availableQuantity: number;
+  price: number;
 }

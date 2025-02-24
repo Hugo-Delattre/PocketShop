@@ -23,6 +23,29 @@ export default class OrderSeeder implements Seeder {
     paidOrder.payment_date = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000); // 2 days ago
     paidOrder.total_price = 0;
 
+    const paidOrders: Order[] = [];
+    for (let i = 0; i < 100; i++) {
+      const order = new Order();
+      const oneOfLast7Days = Math.floor(Math.random() * 7) + 1;
+
+      const creation_date = new Date(
+        Date.now() -
+          oneOfLast7Days * Math.floor(Math.random() * (24 * 60 * 60 * 1000)) +
+          1,
+      ); // one of the last 7 days;
+
+      order.billing = billing;
+      order.user = user;
+      order.creation_date = creation_date;
+      order.is_paid = true;
+      order.payment_date = new Date(
+        creation_date.getTime() + Math.floor(Math.random() * 250000) + 1,
+      );
+      order.total_price = 0;
+
+      paidOrders.push(order);
+    }
+
     const onGoingOrder = new Order();
     onGoingOrder.billing = billing;
     onGoingOrder.user = user;
@@ -30,6 +53,6 @@ export default class OrderSeeder implements Seeder {
     onGoingOrder.is_paid = false;
     onGoingOrder.total_price = 0;
 
-    await repository.insert([paidOrder, onGoingOrder]);
+    await repository.insert([paidOrder, onGoingOrder, ...paidOrders]);
   }
 }

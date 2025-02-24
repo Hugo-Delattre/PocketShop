@@ -20,7 +20,9 @@ export class BillingDetailsService {
   }
 
   findAll() {
-    return this.billingDetailsRepository.find();
+    return this.billingDetailsRepository.find({
+      loadRelationIds: true,
+    });
   }
 
   async findOne(id: number) {

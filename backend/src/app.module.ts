@@ -13,6 +13,7 @@ import { OrderlineModule } from './orderline/orderline.module';
 import { InventoryModule } from './inventory/inventory.module';
 import { BillingDetailsModule } from './billing-details/billing-details.module';
 import { CartModule } from './cart/cart.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { CartModule } from './cart/cart.module';
       synchronize: true, //TODO: Remember to remove this for production
       autoLoadEntities: true,
     }),
+    ConfigModule.forRoot({ isGlobal: true }),
     UserModule,
     AuthModule,
     ProductModule,
@@ -36,6 +38,7 @@ import { CartModule } from './cart/cart.module';
     OrderlineModule,
     CartModule,
     BillingDetailsModule,
+    CartModule,
   ],
 
   controllers: [AppController],

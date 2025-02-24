@@ -15,11 +15,12 @@ describe('UserController', () => {
     username: 'johndoe',
     email: 'john@example.com',
     password: 'hashedPassword123',
+    creation_date: new Date(),
   };
 
   const mockUserService = {
     createUser: jest.fn().mockResolvedValue(mockUser),
-    findAllUser: jest.fn().mockResolvedValue([mockUser]),
+    findAllUser: jest.fn().mockResolvedValue([[mockUser], 1]),
     viewUser: jest.fn().mockResolvedValue(mockUser),
     updateUser: jest.fn().mockResolvedValue(mockUser),
     removeUser: jest.fn().mockResolvedValue(undefined),
@@ -60,14 +61,14 @@ describe('UserController', () => {
 
   describe('findAll', () => {
     it('should return array of users', async () => {
-      expect(await controller.findAll()).toEqual([mockUser]);
+      expect(await controller.findAll(1, 0)).toEqual([[mockUser], 1]);
       expect(service.findAllUser).toHaveBeenCalled();
     });
   });
 
   describe('findOne', () => {
     it('should return a user by id', async () => {
-      expect(await controller.findOne('1')).toEqual(mockUser);
+      expect(await controller.findOne(1)).toEqual(mockUser);
       expect(service.viewUser).toHaveBeenCalledWith(1);
     });
   });
@@ -77,7 +78,7 @@ describe('UserController', () => {
       const updateUserDto: UpdateUserDto = {
         first_name: 'UpdatedJohn',
       };
-      expect(await controller.update('1', updateUserDto)).toEqual(mockUser);
+      expect(await controller.update(1, updateUserDto)).toEqual(mockUser);
       expect(service.updateUser).toHaveBeenCalledWith(1, updateUserDto);
     });
   });
@@ -94,7 +95,7 @@ describe('UserController', () => {
       jest
         .spyOn(service, 'viewUser')
         .mockRejectedValue(new Error('User not found'));
-      await expect(controller.findOne('999')).rejects.toThrow('User not found');
+      await expect(controller.findOne(999)).rejects.toThrow('User not found');
     });
 
     it('should handle invalid user creation', async () => {

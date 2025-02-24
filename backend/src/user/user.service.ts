@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { User } from './entities/user.entity';
@@ -50,8 +50,11 @@ export class UserService {
    * this function is used to get all the user's list
    * @returns promise of array of users
    */
-  findAllUser(): Promise<User[]> {
-    return this.userRepository.find();
+  findAllUser(take: number, skip: number): Promise<[User[], number]> {
+    return this.userRepository.findAndCount({
+      take,
+      skip,
+    });
   }
 
   /**
@@ -59,7 +62,24 @@ export class UserService {
    * @returns promise of of a user
    */
   findOne(username: string): Promise<User> {
-    return this.userRepository.findOneBy({ username });
+    const user = this.userRepository.findOneBy({ username });
+
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    return user;
+  }
+
+  /**
+   * this function is used to get one user by its username
+   * @returns promise of of a user with password field
+   */
+  findOneWithPassword(username: string): Promise<User> {
+    return this.userRepository
+      .createQueryBuilder('user')
+      .addSelect('user.password')
+      .where('user.username = :username', { username })
+      .getOne();
   }
 
   /**
@@ -67,8 +87,13 @@ export class UserService {
    * @param id is type of number, which represent the id of user.
    * @returns promise of user
    */
-  viewUser(id: number): Promise<User> {
-    return this.userRepository.findOneBy({ id });
+  async viewUser(id: number): Promise<User> {
+    const user = await this.userRepository.findOneBy({ id });
+
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    return user;
   }
 
   /**
@@ -78,14 +103,14 @@ export class UserService {
    * @param updateUserDto this is partial type of createUserDto.
    * @returns promise of udpate user
    */
-  updateUser(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+  updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User> {
     const user: User = new User();
     //TODO: update this with new user entity
     // user.name = updateUserDto.name;
     // user.age = updateUserDto.age;
     user.email = updateUserDto.email;
-    // user.username = updateUserDto.username;
-    user.password = updateUserDto.password;
+    user.username = updateUserDto.username;
+    user.id = id;
     return this.userRepository.save(user);
   }
 
@@ -96,5 +121,13 @@ export class UserService {
    */
   removeUser(id: number): Promise<{ affected?: number }> {
     return this.userRepository.delete(id);
+  }
+
+  countUsers() {
+    return this.userRepository.count();
+  }
+
+  async getNewUsersOfTheDay(date: Date): Promise<number> {
+    return await this.userRepository.count({ where: { creation_date: date } });
   }
 }

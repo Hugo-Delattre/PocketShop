@@ -8,8 +8,7 @@ DOCKER_COMPOSE=docker-compose
 
 # Lancer l'env de dev
 dev:
-	$(DOPPLER) --config dev -- $(DOCKER_COMPOSE) up -d --build $(ARGS)
-	docker exec -it mobile /bin/sh -c "npx expo start --tunnel --dev-client --port 8082"
+	$(DOPPLER) --config dev -- $(DOCKER_COMPOSE) --env-file .env.local up -d --build $(ARGS)
 
 prd:
 	$(DOPPLER) --config prd -- $(DOCKER_COMPOSE) --profile prd up --build -d
@@ -21,19 +20,6 @@ stop:
 clean:
 	$(DOCKER_COMPOSE) down --volumes --remove-orphans
 	docker system prune -f
-
-deploy:
-	ansible-playbook -i ansible/inventory ansible/playbooks/deploy.yml --ask-become-pass
-
-
-restart:
-	$(DOPPLER) --config dev -- $(DOCKER_COMPOSE) up -d $(ARGS) $(SERVICE)
-
-stop-service:
-	$(DOPPLER) --config dev -- $(DOCKER_COMPOSE) stop $(SERVICE)
-
-start-service:
-	$(DOPPLER) --config dev -- $(DOCKER_COMPOSE) start $(SERVICE)
 
 
 # ----------------------------------------------------------------

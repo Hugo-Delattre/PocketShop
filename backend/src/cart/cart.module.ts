@@ -7,16 +7,37 @@ import { Orderline } from 'src/orderline/entities/orderline.entity';
 import { Inventory } from 'src/inventory/entities/inventory.entity';
 import { Product } from 'src/product/entities/product.entity';
 import { Shop } from 'src/shop/entities/shop.entity';
+import { User } from 'src/user/entities/user.entity';
+import { ProductService } from 'src/product/product.service';
+import { KpiService } from 'src/kpi/kpi.service';
+import { Kpi } from 'src/kpi/entities/kpi.entity';
+import { KpiProducts } from 'src/kpi/entities/kpiProducts.entity';
+import { OrderService } from 'src/order/order.service';
+import { UserService } from 'src/user/user.service';
+import { KpiController } from 'src/kpi/kpi.controller';
+import { PaypalService } from 'src/paypal/paypal.service';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([Kpi]),
+    TypeOrmModule.forFeature([KpiProducts]),
     TypeOrmModule.forFeature([Order]),
     TypeOrmModule.forFeature([Orderline]),
     TypeOrmModule.forFeature([Shop]),
     TypeOrmModule.forFeature([Product]),
     TypeOrmModule.forFeature([Inventory]),
+    TypeOrmModule.forFeature([User]),
   ],
-  controllers: [CartController],
-  providers: [CartService],
+  controllers: [CartController, KpiController],
+  providers: [
+    CartService,
+    ProductService,
+    KpiService,
+    OrderService,
+    KpiService,
+    UserService,
+    PaypalService,
+  ],
+  exports: [CartService],
 })
 export class CartModule {}
