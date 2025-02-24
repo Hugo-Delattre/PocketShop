@@ -1,23 +1,21 @@
-import { Product } from "@/constants/interface/Product";
 import { useState } from "react";
 import getJwt from "@/utils/utils";
 import { CartResponseDao } from "@/constants/interface/Cart";
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL + "/carts";
 const INVOICE_URL = process.env.EXPO_PUBLIC_API_URL + "/invoices";
-type AddPayload = {
+export type AddPayload = {
   productId: string;
   shopId: string;
   userId: string;
 };
 
-type removePayload = {
+export type removePayload = {
   productId: number;
   orderId: number;
   shopId: number;
 };
 
 const useCartApi = () => {
-  const [data, setData] = useState<Product | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
   const [jwtToken, setJwtToken] = useState<string | null>(null);
@@ -79,10 +77,7 @@ const useCartApi = () => {
         },
       });
       if (!response.ok) {
-        console.error("Error while fetching cart");
-        throw new Error(
-          "Error while fetching cart" + " " + response.statusText
-        );
+        console.error("Error while fetching cart" + response);
       }
       const result = await response.json();
       const price = getTotalPriceByCart(userId, result.orderId);
@@ -100,7 +95,7 @@ const useCartApi = () => {
     const jwtToken = await getJwt();
     setJwtToken(jwtToken);
     try {
-      const response = await fetch(`${INVOICE_URL}/${userId}`, {
+      const response = await fetch(`${INVOICE_URL}/${orderId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -108,10 +103,7 @@ const useCartApi = () => {
         },
       });
       if (!response.ok) {
-        console.error("Error while fetching cart");
-        throw new Error(
-          "Error while fetching cart" + " " + response.statusText
-        );
+        console.error("Error while fetching cart" + response);
       }
       const result = await response.json();
       return result.total_price;
@@ -122,6 +114,6 @@ const useCartApi = () => {
       setLoading(false);
     }
   }
-  return { data, loading, error, addToCart, getCart, removeFromCart };
+  return { loading, error, addToCart, getCart, removeFromCart };
 };
 export default useCartApi;

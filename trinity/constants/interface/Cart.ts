@@ -1,4 +1,4 @@
-import { ProductInShop } from "./Product";
+import { ProductInShop, ProductOFF } from "./Product";
 
 export interface CartResponseDao {
   products: Array<CartInfo>;
@@ -8,11 +8,12 @@ export interface CartResponseDao {
 }
 
 export interface CartInfo {
-  productInShop: ProductInShop;
+  product: ProductOFF;
   code: string;
   status: string;
   status_verbose: string;
   available: string;
   availableQuantity: string;
   price: string;
+  selectedQuantity : number;
 }

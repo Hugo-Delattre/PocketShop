@@ -13,8 +13,10 @@ import { ScrollView } from "react-native";
 import Icon from "@rneui/themed/dist/Icon";
 import ProductCard from "@/components/custom/ProductCart";
 import { CartResponseDao } from "@/constants/interface/Cart";
+import { usePathname } from "expo-router";
 export default function Cart() {
   const [cart, setCart] = useState<CartResponseDao>();
+  const path = usePathname();
   const { getCart, loading } = useCartApi();
   useEffect(() => {
     const fetchCart = async () => {
@@ -25,7 +27,7 @@ export default function Cart() {
       setCart(cart);
     };
     fetchCart();
-  }, []);
+  }, [path]);
   return (
     <SafeAreaView>
       <View style={styles.container}>
@@ -48,7 +50,13 @@ export default function Cart() {
             <Fragment>loading..</Fragment>
           ) : (
             cart?.products.map((product) => {
-              return <ProductCard key={product.code} product={product} />;
+              return (
+                <ProductCard
+                  key={product.code}
+                  productData={product}
+                  orderId={cart.orderId}
+                />
+              );
             })
           )}
         </ScrollView>
