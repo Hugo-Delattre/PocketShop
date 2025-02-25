@@ -3,13 +3,15 @@ import apiClient from "../apiClient";
 export const getProducts = async ({
   skip,
   take,
+  search,
 }: {
   skip?: number;
   take?: number;
+  search?: string;
 }) => {
   return await apiClient({
     method: "get",
-    url: `/products?skip=${skip}&take=${take}`,
+    url: `/products?skip=${skip}&take=${take}&search=${search}`,
   });
 };
 

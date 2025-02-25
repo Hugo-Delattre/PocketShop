@@ -11,12 +11,14 @@ import {
 export function useGetUsers(queryPagination?: {
   skip?: number;
   take?: number;
+  search?: string;
 }) {
   return useQuery<[User[], number]>({
     queryKey: [
       "getUsers",
       `skip: ${queryPagination?.skip}`,
       `take: ${queryPagination?.take}`,
+      `search: ${queryPagination?.search}`,
     ],
     staleTime: 20000,
     queryFn: () => getUsers(queryPagination ?? {}).then((res) => res.data),

@@ -14,7 +14,6 @@ import {
   getCoreRowModel,
   PaginationState,
   ColumnFiltersState,
-  Table as TypedTable,
   getFilteredRowModel,
   getPaginationRowModel,
 } from "@tanstack/react-table";
@@ -29,11 +28,8 @@ import classes from "./Table.module.css";
 import { Checkbox } from "../ui/checkbox";
 
 interface TableProps<ProductType extends { id: number }> {
-  searchValue(table: TypedTable<ProductType>): string;
-  searchOnChange(
-    e: React.ChangeEvent<HTMLInputElement>,
-    table: TypedTable<ProductType>
-  ): void;
+  searchValue: string;
+  searchOnChange(value: string): void;
 
   deleteElement(selectedElementId: number): void;
 
@@ -124,9 +120,10 @@ export function Table<ProductType extends { id: number }>({
       <div className="flex items-center justify-between py-4">
         <div className="flex items-center space-x-2">
           <Input
+            autoFocus
             placeholder="Search"
-            value={searchValue(table)}
-            onChange={(event) => searchOnChange(event, table)}
+            value={searchValue}
+            onChange={(event) => searchOnChange(event.target.value)}
             className="w-48"
           />
         </div>

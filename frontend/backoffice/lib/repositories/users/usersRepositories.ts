@@ -15,13 +15,15 @@ export const postLogin = async ({ username, password }: postLoginParam) => {
 export const getUsers = async ({
   skip,
   take,
+  search,
 }: {
   skip?: number;
   take?: number;
+  search?: string;
 }) => {
   return await apiClient({
     method: "get",
-    url: `/users?skip=${skip}&take=${take}`,
+    url: `/users?skip=${skip}&take=${take}&search=${search}`,
   });
 };
 export const getUser = async (id: number) => {

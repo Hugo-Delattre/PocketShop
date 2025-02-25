@@ -18,15 +18,20 @@ import {
 import { Loader } from "@/components/ui/loader";
 import { Error } from "@/components/ui/error";
 import { AxiosError } from "axios";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 
 export default function UserPage() {
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 5,
   });
+  const [searchValue, setSearchValue] = useState("");
+  const [search] = useDebouncedValue(searchValue, 300);
+
   const { data, isLoading, error } = useGetUsers({
     skip: pagination.pageIndex * pagination.pageSize,
     take: pagination.pageSize,
+    search: search,
   });
 
   const { mutateAsync: deleteUser } = useDeleteUser();
@@ -72,12 +77,8 @@ export default function UserPage() {
         setPagination={setPagination}
         columns={columns}
         deleteElement={async (userId) => await deleteUser(userId)}
-        searchValue={(table) =>
-          (table.getColumn("username")?.getFilterValue() as string) ?? ""
-        }
-        searchOnChange={(event, table) =>
-          table.getColumn("username")?.setFilterValue(event.target.value)
-        }
+        searchValue={searchValue}
+        searchOnChange={(value) => setSearchValue(value)}
       >
         {({ isOpen, handleClose, isEditing, selectedItem }) => (
           <UpdateCreateUserModal
