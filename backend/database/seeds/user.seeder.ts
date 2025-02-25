@@ -36,6 +36,8 @@ export default class UserSeeder implements Seeder {
     const userFactory = factoryManager.get(User);
 
     // Insert many records in database.
-    await userFactory.saveMany(3, { password });
+    await userFactory.saveMany(50, {
+      password,
+    });
   }
 }

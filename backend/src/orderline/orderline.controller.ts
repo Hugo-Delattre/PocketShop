@@ -11,7 +11,7 @@ import { OrderlineService } from './orderline.service';
 import { CreateOrderlineDto } from './dto/create-orderline.dto';
 import { UpdateOrderlineDto } from './dto/update-orderline.dto';
 
-@Controller('orderline')
+@Controller('orderlines')
 export class OrderlineController {
   constructor(private readonly orderlineService: OrderlineService) {}
 
@@ -26,20 +26,20 @@ export class OrderlineController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.orderlineService.findOne(+id);
+  findOne(@Param('id') id: number) {
+    return this.orderlineService.findOne(id);
   }
 
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body() updateOrderlineDto: UpdateOrderlineDto,
   ) {
-    return this.orderlineService.update(+id, updateOrderlineDto);
+    return this.orderlineService.update(id, updateOrderlineDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.orderlineService.remove(+id);
+  remove(@Param('id') id: number) {
+    return this.orderlineService.remove(id);
   }
 }

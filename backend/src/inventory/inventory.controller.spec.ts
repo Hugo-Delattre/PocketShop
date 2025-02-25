@@ -3,26 +3,11 @@ import { InventoryController } from './inventory.controller';
 import { InventoryService } from './inventory.service';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
+import { mockInventory, mockInventoryService } from './test-data';
 
 describe('InventoryController', () => {
   let controller: InventoryController;
   let service: InventoryService;
-
-  const mockInventory = {
-    id: '1',
-    price: 99.99,
-    quantity: 10,
-    shop_id: '1',
-    product_id: '1',
-  };
-
-  const mockInventoryService = {
-    create: jest.fn().mockResolvedValue(mockInventory),
-    findAll: jest.fn().mockResolvedValue([mockInventory]),
-    findOne: jest.fn().mockResolvedValue(mockInventory),
-    update: jest.fn().mockResolvedValue(mockInventory),
-    remove: jest.fn().mockResolvedValue(undefined),
-  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({

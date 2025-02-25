@@ -22,5 +22,11 @@ export const userFactory = setSeederFactory(User, async (faker: Faker) => {
 
   user.role = faker.helpers.arrayElement([UserRole.USER]);
 
+  user.creation_date = new Date(
+    new Date().setDate(
+      new Date().getDate() - (Math.floor(Math.random() * 14) + 1),
+    ),
+  );
+
   return user;
 });

@@ -6,13 +6,14 @@ import {
   Param,
   Delete,
   Controller,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Public } from '../auth/data';
 
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -23,8 +24,8 @@ export class UserController {
   }
 
   @Get()
-  findAll() {
-    return this.userService.findAllUser();
+  findAll(@Query('skip') skip: number, @Query('take') take: number) {
+    return this.userService.findAllUser(take, skip);
   }
 
   @Get(':id')
@@ -33,7 +34,7 @@ export class UserController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.updateUser(id, updateUserDto);
   }
 
