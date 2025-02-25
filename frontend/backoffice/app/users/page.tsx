@@ -1,13 +1,13 @@
 "use client";
 import { columns } from "@/app/users/columns";
-import { Table } from "@/components/table/Table";
+import { sortToQueryParam, Table } from "@/components/table/Table";
 import {
   useCreateUser,
   useDeleteUser,
   useGetUsers,
   useUpdateUser,
 } from "@/lib/queries/users";
-import type { PaginationState } from "@tanstack/react-table";
+import type { ColumnSort, PaginationState } from "@tanstack/react-table";
 import { useState } from "react";
 import UpdateCreateUserModal, { ModalUser } from "./UpdateCreateUserModale";
 import {
@@ -18,15 +18,23 @@ import {
 import { Loader } from "@/components/ui/loader";
 import { Error } from "@/components/ui/error";
 import { AxiosError } from "axios";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 
 export default function UserPage() {
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 5,
   });
+  const [searchValue, setSearchValue] = useState("");
+  const [search] = useDebouncedValue(searchValue, 300);
+
+  const [sorting, setSorting] = useState<ColumnSort[]>([]);
+
   const { data, isLoading, error } = useGetUsers({
     skip: pagination.pageIndex * pagination.pageSize,
     take: pagination.pageSize,
+    search: search,
+    sort: sortToQueryParam(sorting),
   });
 
   const { mutateAsync: deleteUser } = useDeleteUser();
@@ -71,13 +79,11 @@ export default function UserPage() {
         pagination={pagination}
         setPagination={setPagination}
         columns={columns}
+        sorting={sorting}
+        setSorting={setSorting}
         deleteElement={async (userId) => await deleteUser(userId)}
-        searchValue={(table) =>
-          (table.getColumn("username")?.getFilterValue() as string) ?? ""
-        }
-        searchOnChange={(event, table) =>
-          table.getColumn("username")?.setFilterValue(event.target.value)
-        }
+        searchValue={searchValue}
+        searchOnChange={(value) => setSearchValue(value)}
       >
         {({ isOpen, handleClose, isEditing, selectedItem }) => (
           <UpdateCreateUserModal

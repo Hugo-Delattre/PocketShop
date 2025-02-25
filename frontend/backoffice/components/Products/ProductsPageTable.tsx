@@ -2,7 +2,7 @@
 
 import { PaginationState } from "@tanstack/react-table";
 
-import React from "react";
+import React, { useState } from "react";
 
 import {
   useCreateProduct,
@@ -17,16 +17,20 @@ import { UpdateCreateModal } from "./UpdateCreateModal";
 
 import { Table } from "../table/Table";
 import { Loader } from "../ui/loader";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 
 export function ProductsPage() {
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
     pageSize: 5,
   });
+  const [searchValue, setSearchValue] = useState("");
+  const [search] = useDebouncedValue(searchValue, 300);
 
   const { data, isLoading } = useGetProducts({
     skip: pagination.pageIndex * pagination.pageSize,
     take: pagination.pageSize,
+    search: search,
   });
 
   const { mutateAsync: deleteProduct } = useDeleteProduct();
@@ -69,12 +73,8 @@ export function ProductsPage() {
         deleteElement={async (selectedProductId) =>
           await deleteProduct(selectedProductId)
         }
-        searchValue={(table) =>
-          (table.getColumn("openFoodFactId")?.getFilterValue() as string) ?? ""
-        }
-        searchOnChange={(event, table) =>
-          table.getColumn("openFoodFactId")?.setFilterValue(event.target.value)
-        }
+        searchValue={searchValue}
+        searchOnChange={(value) => setSearchValue(value)}
       >
         {({ isOpen, handleClose, isEditing, selectedItem }) => (
           <UpdateCreateModal

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { SetStateAction, useState } from "react";
 
 import {
   TableBody,
@@ -13,12 +13,11 @@ import {
   useReactTable,
   getCoreRowModel,
   PaginationState,
-  ColumnFiltersState,
-  Table as TypedTable,
   getFilteredRowModel,
   getPaginationRowModel,
+  ColumnSort,
 } from "@tanstack/react-table";
-import { PlusCircleIcon, TrashIcon } from "lucide-react";
+import { ArrowDown, ArrowUp, PlusCircleIcon, TrashIcon } from "lucide-react";
 
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -28,17 +27,21 @@ import { TableFooterActions } from "./TableFooterActions";
 import classes from "./Table.module.css";
 import { Checkbox } from "../ui/checkbox";
 
+export function sortToQueryParam(sortValue: ColumnSort[]) {
+  return encodeURIComponent(JSON.stringify(sortValue));
+}
+
 interface TableProps<ProductType extends { id: number }> {
-  searchValue(table: TypedTable<ProductType>): string;
-  searchOnChange(
-    e: React.ChangeEvent<HTMLInputElement>,
-    table: TypedTable<ProductType>
-  ): void;
+  searchValue: string;
+  searchOnChange(value: string): void;
 
   deleteElement(selectedElementId: number): void;
 
   data: [ProductType[], number];
   columns: ColumnDef<ProductType, unknown>[];
+
+  sorting?: ColumnSort[];
+  setSorting?: React.Dispatch<SetStateAction<ColumnSort[]>>;
 
   pagination: {
     pageIndex: number;
@@ -60,14 +63,12 @@ export function Table<ProductType extends { id: number }>({
   data,
   columns,
   pagination,
+  sorting,
+  setSorting,
   setPagination,
   deleteElement,
   children,
 }: TableProps<ProductType>) {
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-
   const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
@@ -78,15 +79,19 @@ export function Table<ProductType extends { id: number }>({
     enableMultiRowSelection: false,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     onRowSelectionChange: setRowSelection,
     onPaginationChange: setPagination,
     manualPagination: true,
+    manualSorting: true,
+    enableMultiSort: true,
+    isMultiSortEvent: () => true,
+    maxMultiSortColCount: 3,
+    onSortingChange: setSorting,
     state: {
-      columnFilters,
       rowSelection,
       pagination,
+      sorting,
     },
   });
 
@@ -124,9 +129,10 @@ export function Table<ProductType extends { id: number }>({
       <div className="flex items-center justify-between py-4">
         <div className="flex items-center space-x-2">
           <Input
+            autoFocus
             placeholder="Search"
-            value={searchValue(table)}
-            onChange={(event) => searchOnChange(event, table)}
+            value={searchValue}
+            onChange={(event) => searchOnChange(event.target.value)}
             className="w-48"
           />
         </div>
@@ -170,6 +176,7 @@ export function Table<ProductType extends { id: number }>({
                       style={{ width: w }}
                       key={header.id}
                       className="last-of-type:rounded-tr-lg last-of-type:rounded-br-lg"
+                      onClick={header.column.getToggleSortingHandler()}
                     >
                       {header.isPlaceholder
                         ? null
@@ -177,6 +184,9 @@ export function Table<ProductType extends { id: number }>({
                             header.column.columnDef.header,
                             header.getContext()
                           )}
+                      {{ asc: <ArrowUp />, desc: <ArrowDown /> }[
+                        header.column.getIsSorted() as string
+                      ] ?? null}
                     </TableHead>
                   );
                 })}

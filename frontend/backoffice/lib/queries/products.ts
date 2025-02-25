@@ -10,12 +10,14 @@ import {
 export function useGetProducts(queryPagination?: {
   skip?: number;
   take?: number;
+  search?: string;
 }) {
   return useQuery<[ProductType[], number]>({
     queryKey: [
       "getProducts",
       `skip: ${queryPagination?.skip}`,
       `take: ${queryPagination?.take}`,
+      `search: ${queryPagination?.search}`,
     ],
     staleTime: 20000,
     queryFn: () => getProducts(queryPagination ?? {}).then((res) => res.data),
