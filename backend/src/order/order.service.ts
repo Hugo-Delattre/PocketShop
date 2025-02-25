@@ -40,8 +40,8 @@ export class OrderService {
 
       order.paypal_order_id = paypalOrder.id;
       order.paypal_status = paypalOrder.status;
-
-      return this.orderRepository.save(order);
+      this.orderRepository.save(order);
+      return paypalOrder.links.find((link) => link.rel === 'approve')?.href;
     } catch (error) {
       throw new HttpException(
         `Failed to create PayPal order: ${error.message}`,
