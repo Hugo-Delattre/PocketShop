@@ -1,4 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import * as WebBrowser from "expo-web-browser";
 import {
   StyleSheet,
   Text,
@@ -14,10 +15,14 @@ import Icon from "@rneui/themed/dist/Icon";
 import ProductCard from "@/components/custom/ProductCart";
 import { CartResponseDao } from "@/constants/interface/Cart";
 import { usePathname } from "expo-router";
+import usePaypalApi from "@/hooks/api/paypal";
+
 export default function Cart() {
   const [cart, setCart] = useState<CartResponseDao>();
   const path = usePathname();
   const { getCart, loading } = useCartApi();
+  const { initiatePaypalPayment, loading: isPaypalLoading, error } = usePaypalApi();
+
   useEffect(() => {
     const fetchCart = async () => {
       const cart = await getCart(1);
@@ -28,6 +33,22 @@ export default function Cart() {
     };
     fetchCart();
   }, [path]);
+
+  const handlePaypalPayment = async () => {
+    // if (!order?.id) return;
+    // console.log(order.id);
+    console.log("handlePaypalPayment");
+    try {
+      const paypalUrl = await initiatePaypalPayment(2); //We will have to use order.id instead, for now i've just used an hardcoded value
+      if (paypalUrl) {
+          console.log("Redirection vers PayPal :", paypalUrl);
+        await WebBrowser.openBrowserAsync(paypalUrl);
+      }
+    } catch (err) {
+      console.error("Erreur lors du paiement PayPal :", err);
+    }
+  };
+
   return (
     <SafeAreaView>
       <View style={styles.container}>
@@ -47,7 +68,7 @@ export default function Cart() {
       <View style={styles.productCardContainer}>
         <ScrollView style={styles.scrollArea}>
           {loading ? (
-            <Fragment>loading..</Fragment>
+            <Text>loading..</Text>
           ) : (
             cart?.products.map((product) => {
               return (
@@ -64,12 +85,14 @@ export default function Cart() {
       <View style={styles.payArea}>
         <Text style={styles.checkoutText}>Checkout {cart?.totalPrice}</Text>
         <TouchableOpacity
-          style={styles.paypal}
-          onPress={() => console.log("remove")}
-        >
-          <Icon name={"paypal"} size={25} color="white" />
-          <Text style={styles.payText}>Pay now</Text>
-        </TouchableOpacity>
+                  style={styles.paypal}
+                  onPress={() => {handlePaypalPayment(); console.log("pay clicked")}}
+                >
+                  <Icon name={"paypal"} size={25} color="white" />
+                  <Text style={styles.payText}>
+                    {isPaypalLoading ? "Chargement..." : "Pay now"}
+                  </Text>
+                </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
