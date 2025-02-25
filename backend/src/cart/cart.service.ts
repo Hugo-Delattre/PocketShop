@@ -43,14 +43,14 @@ export class CartService {
   ) {}
 
   async newOrdelineByNewProduct(
-    productId: number,
+    productId: string,
     orderId: number,
     shopId: number,
   ) {
     console.log('New orderline by new product');
     const shop = await this.shopRepository.findOne({ where: { id: shopId } });
     const product = await this.productRepository.findOne({
-      where: { id: productId },
+      where: { open_food_fact_id: productId },
     });
     if (!product) {
       throw new Error('Product not found');
@@ -96,13 +96,13 @@ export class CartService {
     await this.updateStock(productId, shopId, -orderLine.quantity);
   }
   async newOrderByFirstProduct(
-    productId: number,
+    productId: string,
     shopId: number,
     userId: number,
   ) {
     const shop = await this.shopRepository.findOne({ where: { id: shopId } });
     const product = await this.productRepository.findOne({
-      where: { id: productId },
+      where: { open_food_fact_id: productId },
     });
     const inventory = await this.inventoryRepository.findOne({
       where: { product: product, shop: shop },
@@ -136,7 +136,7 @@ export class CartService {
   async updateQuantityOrderline(
     order: Order,
     orderline: Orderline,
-    productId: number,
+    productId: string,
     shopId: number,
     quantity: number,
   ) {
@@ -156,12 +156,12 @@ export class CartService {
     await this.updateStock(productId, shopId, -quantity);
   }
 
-  async updateStock(productId: number, shopId: number, quantity: number) {
+  async updateStock(productId: string, shopId: number, quantity: number) {
     console.log('Updating stock');
     const shop = await this.shopRepository.findOne({ where: { id: shopId } });
     console.log('Shop : ' + shop);
     const product = await this.productRepository.findOne({
-      where: { id: productId },
+      where: { open_food_fact_id: productId },
     });
 
     const inventory = await this.inventoryRepository.findOne({
@@ -177,11 +177,17 @@ export class CartService {
   }
   async updateOrderTotalPrice(order: Order, price: number) {
     const newPrice = Number(order.total_price) + Number(price);
+    console.log('old price: ' + order.total_price);
+    console.log('adding : ' + price);
+    console.log('New price : ' + newPrice);
     await this.orderRepository.update(order.id, {
       total_price: newPrice,
     });
     console.log('Order total price updated');
-    await this.orderRepository.save(order);
+    const orderEntity = await this.orderRepository.findOne({
+      where: { id: order.id },
+    });
+    await this.orderRepository.save(orderEntity);
   }
   async addToCart(addProductDto: AddProductDto) {
     try {
@@ -198,7 +204,7 @@ export class CartService {
       if (!order) {
         console.log('order doesnt exist');
         await this.newOrderByFirstProduct(
-          product.id,
+          product.open_food_fact_id,
           addProductDto.shopId,
           addProductDto.userId,
         );
@@ -220,7 +226,7 @@ export class CartService {
           if (!orderline) {
             console.log('No orderline');
             await this.newOrdelineByNewProduct(
-              product.id,
+              product.open_food_fact_id,
               addProductDto.orderId,
               addProductDto.shopId,
             );
@@ -229,7 +235,7 @@ export class CartService {
           this.updateQuantityOrderline(
             order,
             orderline,
-            product.id,
+            product.open_food_fact_id,
             addProductDto.shopId,
             1,
           );
@@ -237,7 +243,7 @@ export class CartService {
         } else {
           console.log('order doesnt have product');
           await this.newOrdelineByNewProduct(
-            product.id,
+            product.open_food_fact_id,
             addProductDto.orderId,
             addProductDto.shopId,
           );
@@ -261,7 +267,7 @@ export class CartService {
         const orderline = await this.orderlineRepository.findOne({
           where: {
             order: { id: removeProductDto.orderId },
-            product: { id: removeProductDto.productId },
+            product: { open_food_fact_id: removeProductDto.productId },
           },
           relations: ['product'],
         });
