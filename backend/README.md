@@ -156,3 +156,8 @@ Pour checker les variables injectées par Doppler
 ```bash
 $ doppler run -- printenv
 ```
+
+
+Pour lancer API+db (Sur Windows, à faire depuis un terminal WSL)
+- cd backend
+- doppler run --config dev -- docker-compose up -d --build app

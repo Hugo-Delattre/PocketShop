@@ -3,28 +3,11 @@ import { OrderController } from './order.controller';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { mockOrder, mockOrderService } from './test-data';
 
 describe('OrderController', () => {
   let controller: OrderController;
   let service: OrderService;
-
-  const mockOrder = {
-    id: 1,
-    total_price: 99.99,
-    creation_date: new Date('2024-03-20'),
-    payment_date: new Date('2024-03-20'),
-    is_paid: true,
-    userId: 1,
-    billingId: 1,
-  };
-
-  const mockOrderService = {
-    create: jest.fn().mockResolvedValue(mockOrder),
-    findAll: jest.fn().mockResolvedValue([mockOrder]),
-    findOne: jest.fn().mockResolvedValue(mockOrder),
-    update: jest.fn().mockResolvedValue(mockOrder),
-    remove: jest.fn().mockResolvedValue(undefined),
-  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -61,16 +44,16 @@ describe('OrderController', () => {
     });
   });
 
-  describe('findAll', () => {
+  describe('findAllByUser', () => {
     it('should return array of orders', async () => {
-      expect(await controller.findAll()).toEqual([mockOrder]);
-      expect(service.findAll).toHaveBeenCalled();
+      expect(await controller.findAllByUser(1)).toEqual([mockOrder]);
+      expect(service.findAllbyUser).toHaveBeenCalled();
     });
   });
 
   describe('findOne', () => {
     it('should return an order by id', async () => {
-      expect(await controller.findOne('1')).toEqual(mockOrder);
+      expect(await controller.findOne(1)).toEqual(mockOrder);
       expect(service.findOne).toHaveBeenCalledWith(1);
     });
   });
@@ -82,14 +65,14 @@ describe('OrderController', () => {
         payment_date: new Date('2024-03-21'),
       };
 
-      expect(await controller.update('1', updateOrderDto)).toEqual(mockOrder);
+      expect(await controller.update(1, updateOrderDto)).toEqual(mockOrder);
       expect(service.update).toHaveBeenCalledWith(1, updateOrderDto);
     });
   });
 
   describe('remove', () => {
     it('should remove an order', async () => {
-      expect(await controller.remove('1')).toBeUndefined();
+      expect(await controller.remove(1)).toBeUndefined();
       expect(service.remove).toHaveBeenCalledWith(1);
     });
   });
@@ -99,9 +82,7 @@ describe('OrderController', () => {
       jest
         .spyOn(service, 'findOne')
         .mockRejectedValue(new Error('Order not found'));
-      await expect(controller.findOne('999')).rejects.toThrow(
-        'Order not found',
-      );
+      await expect(controller.findOne(999)).rejects.toThrow('Order not found');
     });
 
     it('should handle invalid create dto', async () => {

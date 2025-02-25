@@ -1,4 +1,4 @@
-import { Controller, Body, Patch } from '@nestjs/common';
+import { Controller, Body, Patch, Get, Param } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { AddProductDto } from './dto/add-product-dto';
 import { RemoveProductDto } from './dto/remove-product-dto';
@@ -14,5 +14,10 @@ export class CartController {
   @Patch('/remove')
   removeFromCart(@Body() removeProductDto: RemoveProductDto) {
     return this.cartService.removeFromCart(removeProductDto);
+  }
+
+  @Get(':userId')
+  getCart(@Param('userId') userId: number) {
+    return this.cartService.getCart(userId);
   }
 }

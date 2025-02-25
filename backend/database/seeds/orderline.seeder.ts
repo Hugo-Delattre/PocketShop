@@ -16,7 +16,7 @@ export default class OrderLineSeeder implements Seeder {
 
     const orderlinesPromises = orders.map(async (order) => {
       const products = await repositoryProduct.find({ take: 3 });
-
+      let amount = 0;
       const orderLines = products.map(async (product) => {
         const inventory = await repositoryInventory.findOneBy({
           product: { id: product.id },
@@ -27,9 +27,15 @@ export default class OrderLineSeeder implements Seeder {
         orderLine.quantity = Math.floor(Math.random() * inventory.quantity) + 1;
         orderLine.product = product;
         orderLine.order = order;
+        const newPrice = orderLine.price_at_order * orderLine.quantity;
+        amount += newPrice;
+
         await repository.insert(orderLine);
       });
       await Promise.all(orderLines);
+      await repositoryOrder.update(order.id, {
+        total_price: Number(amount.toFixed(2)),
+      });
     });
 
     await Promise.all(orderlinesPromises);
