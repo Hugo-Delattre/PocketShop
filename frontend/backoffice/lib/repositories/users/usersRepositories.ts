@@ -12,10 +12,16 @@ export const postLogin = async ({ username, password }: postLoginParam) => {
   });
 };
 
-export const getUsers = async () => {
+export const getUsers = async ({
+  skip,
+  take,
+}: {
+  skip?: number;
+  take?: number;
+}) => {
   return await apiClient({
     method: "get",
-    url: `/users`,
+    url: `/users?skip=${skip}&take=${take}`,
   });
 };
 export const getUser = async (id: number) => {
@@ -41,10 +47,12 @@ export const deleteUser = async (id: number) => {
 };
 
 export const updateUser = async (user: User) => {
+  const { id, ...userToUpdate } = user;
+
   return await apiClient({
     method: "patch",
-    url: `/users/${user.id}`,
-    data: user,
+    url: `/users/${id}`,
+    data: userToUpdate,
   });
 };
 
@@ -62,3 +70,5 @@ export type User = {
   password: string;
   role: UserRole;
 };
+
+export type ClientSideUser = Omit<User, "password">;

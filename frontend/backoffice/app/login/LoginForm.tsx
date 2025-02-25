@@ -13,16 +13,15 @@ export function LoginForm() {
 
   const router = useRouter();
 
-  const onLogin = (event: React.FormEvent<HTMLFormElement>) => {
+  const onLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    postLogin(signIndata)
-      .then((res) => {
-        token.setToken(jwtConstants.key, res.data.access_token);
-        router.push("/");
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    try {
+      const res = await postLogin(signIndata);
+      token.setToken(jwtConstants.key, res.data.access_token);
+      router.push("/");
+    } catch (error) {
+      console.error(error);
+    }
   };
   return (
     <form onSubmit={onLogin} className="space-y-6">
@@ -57,7 +56,10 @@ export function LoginForm() {
           }
         />
       </fieldset>
-      <button type="submit" className="btn btn-lg btn-primary pull-xs-right w-full py-2 px-4 bg-indigo-600 text-white rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+      <button
+        type="submit"
+        className="btn btn-lg btn-primary pull-xs-right w-full py-2 px-4 bg-indigo-600 text-white rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+      >
         Log in
       </button>
     </form>
