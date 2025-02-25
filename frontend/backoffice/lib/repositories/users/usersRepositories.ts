@@ -16,14 +16,16 @@ export const getUsers = async ({
   skip,
   take,
   search,
+  sort,
 }: {
   skip?: number;
   take?: number;
   search?: string;
+  sort?: string;
 }) => {
   return await apiClient({
     method: "get",
-    url: `/users?skip=${skip}&take=${take}&search=${search}`,
+    url: `/users?skip=${skip}&take=${take}&search=${search}&sort=${sort}`,
   });
 };
 export const getUser = async (id: number) => {
