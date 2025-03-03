@@ -1,4 +1,4 @@
-import { ProductInShop } from "@/constants/interface/Product";
+import { ProductInShop, ProductOFF } from "@/constants/interface/Product";
 import { useState, useCallback, useEffect } from "react";
 import getJwt from "@/utils/utils";
 
@@ -66,7 +66,7 @@ const useProductApi = () => {
 
   const updateProduct = async (
     id: string,
-    product: Product
+    product: ProductOFF
   ): Promise<any | null> => {
     setLoading(true);
 
