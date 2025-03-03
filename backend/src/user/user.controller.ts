@@ -7,11 +7,16 @@ import {
   Delete,
   Controller,
   Query,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Public } from '../auth/data';
+import { RolesGuard } from '../auth/roles.guard';
+import { UserRole } from './entities/user.entity';
+import { Roles } from '../auth/roles.decorator';
 
 @Controller('users')
 export class UserController {
@@ -24,6 +29,8 @@ export class UserController {
   }
 
   @Get()
+  @Roles(UserRole.ADMIN)
+  @UseGuards(RolesGuard)
   findAll(@Query('skip') skip: number, @Query('take') take: number) {
     return this.userService.findAllUser(take, skip);
   }
@@ -34,8 +41,14 @@ export class UserController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.updateUser(id, updateUserDto);
+  @Roles(UserRole.ADMIN)
+  @UseGuards(RolesGuard)
+  update(
+    @Param('id') id: number,
+    @Body() updateUserDto: UpdateUserDto,
+    @Request() req,
+  ) {
+    return this.userService.updateUser(id, updateUserDto, req.user.role);
   }
 
   @Delete(':id')

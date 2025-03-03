@@ -48,7 +48,6 @@ export class AppController {
     return this.userService.createUser(createUserDto);
   }
 
-  @UseGuards(LocalAuthGuard)
   @Post('auth/logout')
   async logout(@Request() req) {
     return req.logout();

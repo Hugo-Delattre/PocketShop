@@ -3,7 +3,7 @@ import { Repository } from 'typeorm';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { User } from './entities/user.entity';
+import { User, UserRole } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -71,6 +71,19 @@ export class UserService {
   }
 
   /**
+   * this function is used to get one user by its id
+   * @returns promise of of a user
+   */
+  findOneById(id: number): Promise<User> {
+    const user = this.userRepository.findOneBy({ id });
+
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    return user;
+  }
+
+  /**
    * this function is used to get one user by its username
    * @returns promise of of a user with password field
    */
@@ -103,8 +116,21 @@ export class UserService {
    * @param updateUserDto this is partial type of createUserDto.
    * @returns promise of udpate user
    */
-  updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+  async updateUser(
+    id: number,
+    updateUserDto: UpdateUserDto,
+    role: UserRole,
+  ): Promise<User> {
     const user: User = new User();
+    console.log(role, updateUserDto);
+
+    if (updateUserDto.role && role === UserRole.ADMIN) {
+      user.role = updateUserDto.role;
+    }
+    if (updateUserDto.password && role === UserRole.ADMIN) {
+      user.password = await this.hash(updateUserDto.password);
+    }
+
     //TODO: update this with new user entity
     // user.name = updateUserDto.name;
     // user.age = updateUserDto.age;

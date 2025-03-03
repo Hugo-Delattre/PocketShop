@@ -26,7 +26,7 @@ export class ProductController {
     return this.productService.findAll(take, skip);
   }
 
-  @Get(':id')
+  @Get(':openFoodFactId')
   findOne(@Param('openFoodFactId') openFoodFactId: number) {
     return this.productService.findOne(openFoodFactId);
   }
