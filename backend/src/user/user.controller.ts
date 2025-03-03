@@ -31,8 +31,13 @@ export class UserController {
   @Get()
   @Roles(UserRole.ADMIN)
   @UseGuards(RolesGuard)
-  findAll(@Query('skip') skip: number, @Query('take') take: number) {
-    return this.userService.findAllUser(take, skip);
+  findAll(
+    @Query('skip') skip: number,
+    @Query('take') take: number,
+    @Query('search') search?: string,
+    @Query('sort') sort?: string,
+  ) {
+    return this.userService.findAllUser(take, skip, search, sort);
   }
 
   @Get(':id')

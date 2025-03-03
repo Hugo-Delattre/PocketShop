@@ -22,8 +22,12 @@ export class ProductController {
   }
 
   @Get()
-  findAll(@Query('skip') skip: number, @Query('take') take: number) {
-    return this.productService.findAll(take, skip);
+  findAll(
+    @Query('skip') skip: number,
+    @Query('take') take: number,
+    @Query('search') search?: string,
+  ) {
+    return this.productService.findAll(take, skip, search);
   }
 
   @Get(':openFoodFactId')

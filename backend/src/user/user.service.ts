@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcrypt';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -50,10 +50,33 @@ export class UserService {
    * this function is used to get all the user's list
    * @returns promise of array of users
    */
-  findAllUser(take: number, skip: number): Promise<[User[], number]> {
+  findAllUser(
+    take: number,
+    skip: number = 0,
+    search: string = '',
+    sort: string = '[]',
+  ): Promise<[User[], number]> {
+    const sortObj: { id: string; desc: boolean }[] = JSON.parse(sort);
+
+    let order = {};
+
+    if (sortObj && Array.isArray(sortObj) && sortObj.length > 0) {
+      order = sortObj.reduce((acc, { id, desc }) => {
+        acc[id] = desc === true ? 'DESC' : 'ASC';
+        return acc;
+      }, {});
+    }
+
     return this.userRepository.findAndCount({
       take,
       skip,
+      where: [
+        { username: ILike(`%${search}%`) },
+        { first_name: ILike(`%${search}%`) },
+        { last_name: ILike(`%${search}%`) },
+        { email: ILike(`%${search}%`) },
+      ],
+      order,
     });
   }
 

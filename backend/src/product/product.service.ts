@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
@@ -53,11 +53,19 @@ export class ProductService {
     return this.productRepository.save(product);
   }
 
-  async findAll(take: number, skip: number): Promise<[Product[], number]> {
+  async findAll(
+    take: number,
+    skip: number,
+    search: string = '',
+  ): Promise<[Product[], number]> {
     return this.productRepository.findAndCount({
       relations: ['inventory', 'inventory.shop'],
       take,
       skip,
+      where: [
+        { open_food_fact_id: ILike(`%${search}%`) },
+        { inventory: { shop: { name: ILike(`%${search}%`) } } },
+      ],
     });
   }
 
