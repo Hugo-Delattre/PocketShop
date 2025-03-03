@@ -13,7 +13,9 @@ export const usePaypalApi = () => {
   const [error, setError] = useState<Error | null>(null);
   const [result, setResult] = useState<string | null>(null);
 
-  const initiatePaypalPayment = async (invoiceId: string): Promise<string> => {
+  const initiatePaypalPayment = async (
+    invoiceId: number
+  ): Promise<{ paypalUrl: string }> => {
     setLoading(true);
     const jwtToken = await getJwt();
     console.log("sending request");
@@ -30,9 +32,6 @@ export const usePaypalApi = () => {
       if (!response.ok) {
         throw new Error("Failed to initiate PayPal payment");
       }
-
-        console.log("response.json()", response.json());
-
       const result = await response.json();
       setResult(result);
       return result;
@@ -45,7 +44,7 @@ export const usePaypalApi = () => {
   };
 
   return {
-      result,
+    result,
     loading,
     error,
     initiatePaypalPayment,
