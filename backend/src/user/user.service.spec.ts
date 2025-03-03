@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from './user.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
+import { User, UserRole } from './entities/user.entity';
 import { Repository } from 'typeorm';
 
 describe('UserService', () => {
@@ -81,7 +81,9 @@ describe('UserService', () => {
   describe('updateUser', () => {
     it('should update a user', async () => {
       const updateUserDto = { first_name: 'Updated' };
-      expect(await service.updateUser(1, updateUserDto)).toEqual(mockUser);
+      expect(await service.updateUser(1, updateUserDto, UserRole.USER)).toEqual(
+        mockUser,
+      );
     });
   });
 

@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { UserRole } from '../user/entities/user.entity';
+import { NotFoundException } from '@nestjs/common';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -62,12 +63,13 @@ describe('AuthService', () => {
       expect(result).toBeDefined();
     });
 
-    it('should return null when user is not found', async () => {
+    it('should return an exception when user is not found', async () => {
       jest
         .spyOn(userService, 'findOneWithPassword')
         .mockResolvedValueOnce(null);
-      const result = await service.validateUser('wronguser', 'password123');
-      expect(result).toBeNull();
+      await expect(
+        service.validateUser('wronguser', 'password123'),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -78,6 +80,7 @@ describe('AuthService', () => {
       expect(jwtService.sign).toHaveBeenCalledWith({
         username: mockUser.username,
         sub: mockUser.id,
+        role: UserRole.USER,
       });
     });
   });

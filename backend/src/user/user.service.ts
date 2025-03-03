@@ -1,9 +1,9 @@
 import * as bcrypt from 'bcrypt';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { User } from './entities/user.entity';
+import { User, UserRole } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -50,10 +50,33 @@ export class UserService {
    * this function is used to get all the user's list
    * @returns promise of array of users
    */
-  findAllUser(take: number, skip: number): Promise<[User[], number]> {
+  findAllUser(
+    take: number,
+    skip: number = 0,
+    search: string = '',
+    sort: string = '[]',
+  ): Promise<[User[], number]> {
+    const sortObj: { id: string; desc: boolean }[] = JSON.parse(sort);
+
+    let order = {};
+
+    if (sortObj && Array.isArray(sortObj) && sortObj.length > 0) {
+      order = sortObj.reduce((acc, { id, desc }) => {
+        acc[id] = desc === true ? 'DESC' : 'ASC';
+        return acc;
+      }, {});
+    }
+
     return this.userRepository.findAndCount({
       take,
       skip,
+      where: [
+        { username: ILike(`%${search}%`) },
+        { first_name: ILike(`%${search}%`) },
+        { last_name: ILike(`%${search}%`) },
+        { email: ILike(`%${search}%`) },
+      ],
+      order,
     });
   }
 
@@ -63,6 +86,19 @@ export class UserService {
    */
   findOne(username: string): Promise<User> {
     const user = this.userRepository.findOneBy({ username });
+
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    return user;
+  }
+
+  /**
+   * this function is used to get one user by its id
+   * @returns promise of of a user
+   */
+  findOneById(id: number): Promise<User> {
+    const user = this.userRepository.findOneBy({ id });
 
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
@@ -103,8 +139,21 @@ export class UserService {
    * @param updateUserDto this is partial type of createUserDto.
    * @returns promise of udpate user
    */
-  updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+  async updateUser(
+    id: number,
+    updateUserDto: UpdateUserDto,
+    role: UserRole,
+  ): Promise<User> {
     const user: User = new User();
+    console.log(role, updateUserDto);
+
+    if (updateUserDto.role && role === UserRole.ADMIN) {
+      user.role = updateUserDto.role;
+    }
+    if (updateUserDto.password && role === UserRole.ADMIN) {
+      user.password = await this.hash(updateUserDto.password);
+    }
+
     //TODO: update this with new user entity
     // user.name = updateUserDto.name;
     // user.age = updateUserDto.age;

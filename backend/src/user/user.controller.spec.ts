@@ -3,6 +3,7 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserRole } from './entities/user.entity';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -78,8 +79,16 @@ describe('UserController', () => {
       const updateUserDto: UpdateUserDto = {
         first_name: 'UpdatedJohn',
       };
-      expect(await controller.update(1, updateUserDto)).toEqual(mockUser);
-      expect(service.updateUser).toHaveBeenCalledWith(1, updateUserDto);
+      expect(
+        await controller.update(1, updateUserDto, {
+          user: { role: UserRole.USER },
+        }),
+      ).toEqual(mockUser);
+      expect(service.updateUser).toHaveBeenCalledWith(
+        1,
+        updateUserDto,
+        UserRole.USER,
+      );
     });
   });
 
