@@ -21,7 +21,11 @@ export default function Cart() {
   const [cart, setCart] = useState<CartResponseDao>();
   const path = usePathname();
   const { getCart, loading } = useCartApi();
-  const { initiatePaypalPayment, loading: isPaypalLoading, error } = usePaypalApi();
+  const {
+    initiatePaypalPayment,
+    loading: isPaypalLoading,
+    error,
+  } = usePaypalApi();
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -39,10 +43,10 @@ export default function Cart() {
     // console.log(order.id);
     console.log("handlePaypalPayment");
     try {
-      const paypalUrl = await initiatePaypalPayment(2); //We will have to use order.id instead, for now i've just used an hardcoded value
-      if (paypalUrl) {
-          console.log("Redirection vers PayPal :", paypalUrl);
-        await WebBrowser.openBrowserAsync(paypalUrl);
+      const paypalResponse = await initiatePaypalPayment(2); //We will have to use order.id instead, for now i've just used an hardcoded value
+      if (paypalResponse) {
+        console.log("Redirection vers PayPal :", paypalResponse);
+        await WebBrowser.openBrowserAsync(paypalResponse?.paypalUrl);
       }
     } catch (err) {
       console.error("Erreur lors du paiement PayPal :", err);
@@ -85,14 +89,17 @@ export default function Cart() {
       <View style={styles.payArea}>
         <Text style={styles.checkoutText}>Checkout {cart?.totalPrice}</Text>
         <TouchableOpacity
-                  style={styles.paypal}
-                  onPress={() => {handlePaypalPayment(); console.log("pay clicked")}}
-                >
-                  <Icon name={"paypal"} size={25} color="white" />
-                  <Text style={styles.payText}>
-                    {isPaypalLoading ? "Chargement..." : "Pay now"}
-                  </Text>
-                </TouchableOpacity>
+          style={styles.paypal}
+          onPress={() => {
+            handlePaypalPayment();
+            console.log("pay clicked");
+          }}
+        >
+          <Icon name={"paypal"} size={25} color="white" />
+          <Text style={styles.payText}>
+            {isPaypalLoading ? "Chargement..." : "Pay now"}
+          </Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
