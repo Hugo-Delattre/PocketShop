@@ -4,7 +4,6 @@ import {
   Column,
   Entity,
   ManyToMany,
-  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -29,10 +28,7 @@ export class Product {
   })
   kpis: KpiProducts[];
 
-  @ManyToOne(() => Category, (category) => category.products, {
-    onDelete: 'CASCADE',
-  })
-  @ManyToMany(() => Category, {
+  @ManyToMany(() => Category, (category) => category.products, {
     onDelete: 'CASCADE',
   })
   categories: Category[];
