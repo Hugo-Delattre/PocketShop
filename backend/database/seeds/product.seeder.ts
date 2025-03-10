@@ -15,6 +15,8 @@ export default class ProductSeeder implements Seeder {
       '3266980033613',
       '3242274034054',
       '3242274030056',
+      '6132500711033',
+      '3017620425035',
     ];
 
     const products = ids.map((id) => {

@@ -56,10 +56,10 @@ export class ProductService {
       open_food_fact_id: openFoodFactId,
       inventory: [inventory],
     });
-    this.saveCategories(openFoodFactId);
+    this.saveCategories(openFoodFactId, product);
     return this.productRepository.save(product);
   }
-  private async saveCategories(openFoodFactId: string) {
+  private async saveCategories(openFoodFactId: string, product: Product) {
     const response = await fetch(`${urlOpenFoodFact}/${openFoodFactId}`);
     if (!response.ok) {
       throw new HttpException(
@@ -69,6 +69,7 @@ export class ProductService {
     }
     const data = await response.json();
     const productOFF: ProductOFF = data.product;
+    product.categories = [];
     const categories = productOFF.categories
       .split(',')
       .map((category) => category.trim()); // FROM "categories": "Condiments, Sauces, ... ," to  ["Condiments", "Sauces", ...]
@@ -76,13 +77,19 @@ export class ProductService {
       const categoryEntity = await this.categoryRepository.findOne({
         where: { name: category },
       });
+
       if (!categoryEntity) {
         const newCategory = this.categoryRepository.create({
           name: category,
         });
         this.categoryRepository.save(newCategory);
+        product.categories.push(newCategory);
+      } else {
+        product.categories.push(categoryEntity);
       }
     }
+    console.log(product.categories);
+    this.productRepository.save(product);
   }
   async findAll(
     take: number,
@@ -260,14 +267,16 @@ export class ProductService {
       });
       if (categoryEntity) {
         categoriesEntities.push(categoryEntity);
+
+        const productsInShop =
+          await this.getProductsByCategories(categoriesEntities);
+
+        return productsInShop;
       }
     }
     if (categoriesEntities.length === 0) {
       throw new HttpException('Categories not found', HttpStatus.NO_CONTENT);
     }
-    const productsInShop =
-      await this.getProductsByCategories(categoriesEntities);
-    return productsInShop;
   }
   async recommendedByLastBuy(userId: number): Promise<ProductInShop[]> {
     const ordelines = await this.orderLineRepository.find({
@@ -315,14 +324,23 @@ export class ProductService {
   private async getProductsByCategories(
     categories: Category[],
   ): Promise<ProductInShop[]> {
-    const products = await this.productRepository.query(`
-      SELECT p.*, COUNT(pc.category_id) as category_matches
-      FROM product p
-      JOIN category_products pc ON p.id = pc.product_id
-      WHERE pc.category_id IN (${categories.map((cat) => cat.id).join(',')})
-      GROUP BY p.id
-      ORDER BY category_matches DESC
-    `);
+    const products = [];
+    console.log(categories);
+    for (const category of categories) {
+      console.log(JSON.stringify(category) + 'loop');
+      const productsByCategory = await this.productRepository.find({
+        relations: ['categories'],
+        where: {
+          categories: {
+            id: category.id,
+          },
+        },
+      });
+      products.push(...productsByCategory);
+    }
+    if (products.length === 0) {
+      throw new HttpException('Products not found', HttpStatus.NO_CONTENT);
+    }
     const productsInShop =
       await this.convertListProductsToProductInShop(products);
     return productsInShop;
