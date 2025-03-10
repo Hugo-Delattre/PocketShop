@@ -6,7 +6,7 @@ import axios, {
   AxiosError,
 } from "axios";
 
-const host = "http://localhost:3000";
+const host = "http://209.38.247.123:3000";
 
 const apiClient = axios.create({
   baseURL: host,
