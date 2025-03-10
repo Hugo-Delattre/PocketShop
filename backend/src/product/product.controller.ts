@@ -56,7 +56,7 @@ export class ProductController {
   }
 
   @Get('/recommended/categories')
-  recommendedByCategories(@Body('categories') categories: string[]) {
+  recommendedByCategories(@Body() categories: string[]) {
     console.log(categories + 'in controller');
     return this.productService.recommendedByCategories(categories);
   }

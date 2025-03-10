@@ -14,11 +14,6 @@ export class Category {
   id: number;
   @Column()
   name: string;
-  @Column()
-  allergens: string;
-
-  @Column()
-  origins: string;
 
   @ManyToMany(() => Product, (product) => product.categories)
   @JoinTable({

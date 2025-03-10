@@ -56,9 +56,34 @@ export class ProductService {
       open_food_fact_id: openFoodFactId,
       inventory: [inventory],
     });
+    this.saveCategories(openFoodFactId);
     return this.productRepository.save(product);
   }
-
+  private async saveCategories(openFoodFactId: string) {
+    const response = await fetch(`${urlOpenFoodFact}/${openFoodFactId}`);
+    if (!response.ok) {
+      throw new HttpException(
+        `Failed to get info from open food fact with product id ${openFoodFactId}`,
+        HttpStatus.SERVICE_UNAVAILABLE,
+      );
+    }
+    const data = await response.json();
+    const productOFF: ProductOFF = data.product;
+    const categories = productOFF.categories
+      .split(',')
+      .map((category) => category.trim()); // FROM "categories": "Condiments, Sauces, ... ," to  ["Condiments", "Sauces", ...]
+    for (const category of categories) {
+      const categoryEntity = await this.categoryRepository.findOne({
+        where: { name: category },
+      });
+      if (!categoryEntity) {
+        const newCategory = this.categoryRepository.create({
+          name: category,
+        });
+        this.categoryRepository.save(newCategory);
+      }
+    }
+  }
   async findAll(
     take: number,
     skip: number,
@@ -215,7 +240,10 @@ export class ProductService {
       throw new HttpException('No recent buy', HttpStatus.NO_CONTENT);
     }
     const categories = lastBuy.categories;
-    const productsInShop = await this.recommendedByCategories(categories);
+    const categoriesArray = categories
+      .split(',')
+      .map((category) => category.trim());
+    const productsInShop = await this.recommendedByCategories(categoriesArray);
     return productsInShop[0];
   }
 
