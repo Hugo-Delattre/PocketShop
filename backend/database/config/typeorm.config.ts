@@ -9,7 +9,7 @@ import { inventoryFactory } from 'database/factories/inventory.factory';
 
 const options = {
   type: 'postgres',
-  host: process.env.DATABASE_HOST || 'localhost',
+  host: process.env.DATABASE_HOST || 'postgres',
   port: parseInt(String(process.env.DATABASE_PORT), 10) || 5432,
   username: 'postgres',
   password: 'postgres',

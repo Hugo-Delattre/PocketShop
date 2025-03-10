@@ -57,8 +57,8 @@ export class PaypalService {
       {
         intent: 'CAPTURE',
         application_context: {
-          return_url: `myapp://paypal-success`,
-          cancel_url: `myapp://paypal-cancel`,
+          return_url: `trinity://payment-success`,
+          cancel_url: `trinity://payment-cancel`,
         },
         purchase_units: [
           {
