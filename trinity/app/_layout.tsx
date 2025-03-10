@@ -1,6 +1,7 @@
 import {
   DarkTheme,
   DefaultTheme,
+  NavigationContainer,
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
@@ -23,6 +24,7 @@ import {
 } from "@expo-google-fonts/karla";
 import { CrimsonText_400Regular } from "@expo-google-fonts/crimson-text";
 import { Text } from "react-native";
+import PayPalRedirectHandler from "@/components/PaypalRedirectHandler";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -60,6 +62,9 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+      <NavigationContainer>
+        <PayPalRedirectHandler />
+      </NavigationContainer>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />

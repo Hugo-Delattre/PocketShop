@@ -1,4 +1,4 @@
-import { ProductInShop } from "@/constants/interface/Product";
+import { ProductInShop, ProductOFF } from "@/constants/interface/Product";
 import { useState, useCallback, useEffect } from "react";
 import { getJwtFromStorage } from "@/utils/utils";
 
