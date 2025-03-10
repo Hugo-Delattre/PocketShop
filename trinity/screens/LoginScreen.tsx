@@ -1,19 +1,27 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet } from "react-native";
 
-import useAuth from "../hooks/auth";
+import useAuth, { JWT_User, userAtom } from "../hooks/auth";
+import { jwtDecode } from "jwt-decode";
+import { useSetAtom } from "jotai";
+
 export default function LoginScreen() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const { fetchJwtToken, saveJwtInStorage, setAuthenticated } = useAuth();
+
+  const setUser = useSetAtom(userAtom);
+
+  const { fetchJwtToken, saveJwtInStorage } = useAuth();
   const handleLogin = () => {
     console.log("Logging in with", username, password);
     fetchJwtToken({ username, password })
-      .then((jwt) => saveJwtInStorage(jwt))
-      .then(() => {
-        console.log("Logged in");
-        setAuthenticated(true);
+      .then((jwt) => {
+        saveJwtInStorage(jwt);
+
+        const user: JWT_User = jwtDecode(jwt);
+        setUser(user);
       })
+
       .catch((err) => console.error(err));
   };
 
