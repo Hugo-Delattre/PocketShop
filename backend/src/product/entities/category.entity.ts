@@ -1,4 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Product } from './product.entity';
 
 @Entity()
 export class Category {
@@ -11,4 +19,12 @@ export class Category {
 
   @Column()
   origins: string;
+
+  @ManyToMany(() => Product, (product) => product.categories)
+  @JoinTable({
+    name: 'category_products',
+    joinColumn: { name: 'category_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'product_id', referencedColumnName: 'id' },
+  })
+  products: Product[];
 }

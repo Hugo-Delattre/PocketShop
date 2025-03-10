@@ -28,7 +28,7 @@ export class ProductService {
     @InjectRepository(Shop)
     private readonly shopRepository: Repository<Shop>,
     @InjectRepository(Category)
-    private readonly categoryRepository: Repository<Shop>,
+    private readonly categoryRepository: Repository<Category>,
     @InjectRepository(Orderline)
     private readonly orderLineRepository: Repository<Orderline>,
   ) {}
@@ -210,6 +210,7 @@ export class ProductService {
   async recommended(userId: number): Promise<ProductInShop> {
     const products = await this.recommendedByLastBuy(userId);
     const lastBuy = products[0];
+    console.log(lastBuy);
     if (!lastBuy) {
       throw new HttpException('No recent buy', HttpStatus.NO_CONTENT);
     }
@@ -221,8 +222,11 @@ export class ProductService {
   async recommendedByCategories(
     categories: string[],
   ): Promise<ProductInShop[]> {
+    console.log(categories + 'in service');
     const categoriesEntities = [];
+    console.log(categories);
     for (const category of categories) {
+      console.log(category + 'in service');
       const categoryEntity = await this.categoryRepository.findOne({
         where: { name: ILike(`%${category}%`) },
       });
@@ -231,7 +235,7 @@ export class ProductService {
       }
     }
     if (categoriesEntities.length === 0) {
-      throw new HttpException('Categories not found', HttpStatus.NOT_FOUND);
+      throw new HttpException('Categories not found', HttpStatus.NO_CONTENT);
     }
     const productsInShop =
       await this.getProductsByCategories(categoriesEntities);
@@ -241,13 +245,12 @@ export class ProductService {
     const ordelines = await this.orderLineRepository.find({
       where: { order: { user: { id: userId } } },
       relations: ['product', 'order'],
-
+      take: 5,
       order: {
         order: {
           payment_date: 'DESC',
         },
       },
-      //order by order ...
     });
     const products = ordelines.map((orderline) => orderline.product);
     if (ordelines.length === 0) {
@@ -261,6 +264,7 @@ export class ProductService {
   async bestSellers(ranking: number): Promise<ProductInShop[]> {
     const orderlines = await this.orderLineRepository.find({
       relations: ['product'],
+      take: 5,
     });
 
     const productCounts = new Map<string, number>();
@@ -286,7 +290,7 @@ export class ProductService {
     const products = await this.productRepository.query(`
       SELECT p.*, COUNT(pc.category_id) as category_matches
       FROM product p
-      JOIN product_categories pc ON p.id = pc.product_id
+      JOIN category_products pc ON p.id = pc.product_id
       WHERE pc.category_id IN (${categories.map((cat) => cat.id).join(',')})
       GROUP BY p.id
       ORDER BY category_matches DESC

@@ -11,7 +11,6 @@ import {
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { Category } from './entities/category.entity';
 
 @Controller('products')
 export class ProductController {
@@ -58,6 +57,7 @@ export class ProductController {
 
   @Get('/recommended/categories')
   recommendedByCategories(@Body('categories') categories: string[]) {
+    console.log(categories + 'in controller');
     return this.productService.recommendedByCategories(categories);
   }
 
