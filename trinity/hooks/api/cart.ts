@@ -1,5 +1,5 @@
-import { useState } from "react";
-import getJwt from "@/utils/utils";
+import { useEffect, useState } from "react";
+import { getJwtFromStorage } from "@/utils/utils";
 import { CartResponseDao } from "@/constants/interface/Cart";
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL + "/carts";
 const INVOICE_URL = process.env.EXPO_PUBLIC_API_URL + "/invoices";
@@ -19,10 +19,19 @@ const useCartApi = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
   const [jwtToken, setJwtToken] = useState<string | null>(null);
+  useEffect(() => {
+    const retrieveJwtToken = async () => {
+      const token = await getJwtFromStorage();
+      setJwtToken(token);
+    };
+    retrieveJwtToken();
+  }, []);
+
   const addToCart = async (body: AddPayload): Promise<boolean> => {
     setLoading(true);
-    const jwtToken = await getJwt();
-    setJwtToken(jwtToken);
+    if (!jwtToken) {
+      throw new Error('No JWT token found');
+    }
     // console.log("COUCOU", jwtToken);
     try {
       const response = await fetch(`${BASE_URL}/add`, {
@@ -45,7 +54,6 @@ const useCartApi = () => {
 
   const removeFromCart = async (body: removePayload): Promise<boolean> => {
     setLoading(true);
-    const jwtToken = await getJwt();
     setJwtToken(jwtToken);
     try {
       const response = await fetch(`${BASE_URL}/remove`, {
@@ -66,7 +74,6 @@ const useCartApi = () => {
   };
   const getCart = async (userId: number): Promise<CartResponseDao> => {
     setLoading(true);
-    const jwtToken = await getJwt();
     setJwtToken(jwtToken);
     try {
       const response = await fetch(`${BASE_URL}/${userId}`, {
@@ -92,7 +99,6 @@ const useCartApi = () => {
   };
   const getTotalPriceByCart = async (orderId: number): Promise<Number> => {
     setLoading(true);
-    const jwtToken = await getJwt();
     setJwtToken(jwtToken);
     try {
       const response = await fetch(`${INVOICE_URL}/${orderId}`, {

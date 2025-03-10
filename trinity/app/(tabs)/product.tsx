@@ -42,7 +42,7 @@ export default function ProductScreen() {
   useEffect(() => {
     const fetchProduct = async () => {
       const productData = await getProduct(productId);
-      console.log("Product Data", productData);
+      // console.log("Product Data", productData);
 
       if (productData) {
         setProductShop(productData);
