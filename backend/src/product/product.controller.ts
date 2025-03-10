@@ -23,15 +23,15 @@ export class ProductController {
 
   @Get()
   findAll(
-    @Query('skip') skip: number,
-    @Query('take') take: number,
+    @Query('skip') skip?: number,
+    @Query('take') take?: number,
     @Query('search') search?: string,
   ) {
     return this.productService.findAll(take, skip, search);
   }
 
   @Get(':openFoodFactId')
-  findOne(@Param('openFoodFactId') openFoodFactId: number) {
+  findOne(@Param('openFoodFactId') openFoodFactId: string) {
     return this.productService.findOne(openFoodFactId);
   }
 
@@ -43,5 +43,26 @@ export class ProductController {
   @Delete(':id')
   remove(@Param('id') id: number) {
     return this.productService.remove(+id);
+  }
+
+  @Get('/recommended/topOne/:userId')
+  recommended(@Param('userId') userId: number) {
+    this.productService.recommended(userId);
+  }
+
+  @Get('/recommended/lastBuy/:userId')
+  recommendedByLastBuy(@Param('userId') userId: number) {
+    return this.productService.recommendedByLastBuy(userId);
+  }
+
+  @Get('/recommended/categories')
+  recommendedByCategories(@Body() categories: string[]) {
+    console.log(categories + 'in controller');
+    return this.productService.recommendedByCategories(categories);
+  }
+
+  @Get('/recommended/bestSellers/:ranking')
+  bestSellers(@Param('ranking') ranking: number) {
+    return this.productService.bestSellers(ranking);
   }
 }

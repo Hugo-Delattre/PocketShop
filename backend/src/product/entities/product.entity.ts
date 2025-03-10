@@ -1,6 +1,14 @@
 import { KpiProducts } from '../../kpi/entities/kpiProducts.entity';
 import { Inventory } from '../../inventory/entities/inventory.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Category } from './category.entity';
 
 @Entity()
 export class Product {
@@ -20,4 +28,12 @@ export class Product {
     cascade: true,
   })
   kpis: KpiProducts[];
+
+  @ManyToOne(() => Category, (category) => category.products, {
+    onDelete: 'CASCADE',
+  })
+  @ManyToMany(() => Category, {
+    onDelete: 'CASCADE',
+  })
+  categories: Category[];
 }

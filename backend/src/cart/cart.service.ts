@@ -324,7 +324,7 @@ export class CartService {
     return cart;
   }
   async getInfoProduct(productId: string): Promise<ProductInShop> {
-    return await this.productService.findOne(+productId);
+    return await this.productService.findOne(productId);
   }
 
   async getAverageCartPrice(date: Date): Promise<number> {
