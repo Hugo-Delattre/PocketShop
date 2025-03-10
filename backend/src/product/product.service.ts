@@ -13,6 +13,8 @@ import { Product } from './entities/product.entity';
 import { Inventory } from '../inventory/entities/inventory.entity';
 import { Shop } from '../shop/entities/shop.entity';
 import { ProductInShop, ProductOFF } from './dto/product-info.dto';
+import { Category } from './entities/category.entity';
+import { Orderline } from 'src/orderline/entities/orderline.entity';
 
 const urlOpenFoodFact = 'https://world.openfoodfacts.org/api/v2/product';
 @Injectable()
@@ -25,6 +27,10 @@ export class ProductService {
     private readonly inventoryRepository: Repository<Inventory>,
     @InjectRepository(Shop)
     private readonly shopRepository: Repository<Shop>,
+    @InjectRepository(Category)
+    private readonly categoryRepository: Repository<Shop>,
+    @InjectRepository(Orderline)
+    private readonly orderLineRepository: Repository<Orderline>,
   ) {}
   countProducts() {
     return this.productRepository.count();
@@ -56,7 +62,7 @@ export class ProductService {
   async findAll(
     take: number,
     skip: number,
-    search: string = '',
+    search: string = '%',
   ): Promise<[Product[], number]> {
     return this.productRepository.findAndCount({
       relations: ['inventory', 'inventory.shop'],
@@ -69,7 +75,7 @@ export class ProductService {
     });
   }
 
-  async findOne(openFoodFactId: number): Promise<ProductInShop | undefined> {
+  async findOne(openFoodFactId: string): Promise<ProductInShop | undefined> {
     const product = await this.productRepository.findOne({
       where: { open_food_fact_id: String(openFoodFactId) },
     });
@@ -199,5 +205,107 @@ export class ProductService {
       }
     }
     return { affectedRows };
+  }
+
+  async recommended(userId: number): Promise<ProductInShop> {
+    const products = await this.recommendedByLastBuy(userId);
+    const lastBuy = products[0];
+    if (!lastBuy) {
+      throw new HttpException('No recent buy', HttpStatus.NO_CONTENT);
+    }
+    const categories = lastBuy.categories;
+    const productsInShop = await this.recommendedByCategories(categories);
+    return productsInShop[0];
+  }
+
+  async recommendedByCategories(
+    categories: string[],
+  ): Promise<ProductInShop[]> {
+    const categoriesEntities = [];
+    for (const category of categories) {
+      const categoryEntity = await this.categoryRepository.findOne({
+        where: { name: ILike(`%${category}%`) },
+      });
+      if (categoryEntity) {
+        categoriesEntities.push(categoryEntity);
+      }
+    }
+    if (categoriesEntities.length === 0) {
+      throw new HttpException('Categories not found', HttpStatus.NOT_FOUND);
+    }
+    const productsInShop =
+      await this.getProductsByCategories(categoriesEntities);
+    return productsInShop;
+  }
+  async recommendedByLastBuy(userId: number): Promise<ProductInShop[]> {
+    const ordelines = await this.orderLineRepository.find({
+      where: { order: { user: { id: userId } } },
+      relations: ['product', 'order'],
+
+      order: {
+        order: {
+          payment_date: 'DESC',
+        },
+      },
+      //order by order ...
+    });
+    const products = ordelines.map((orderline) => orderline.product);
+    if (ordelines.length === 0) {
+      throw new HttpException('No recent buy', HttpStatus.NO_CONTENT);
+    }
+    const productsInShop =
+      await this.convertListProductsToProductInShop(products);
+    return productsInShop;
+  }
+
+  async bestSellers(ranking: number): Promise<ProductInShop[]> {
+    const orderlines = await this.orderLineRepository.find({
+      relations: ['product'],
+    });
+
+    const productCounts = new Map<string, number>();
+    orderlines.forEach((orderline) => {
+      const productId = orderline.product.open_food_fact_id;
+      productCounts.set(productId, (productCounts.get(productId) || 0) + 1);
+    });
+
+    const sortedProducts = [...productCounts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, ranking)
+      .map(([productId]) => productId);
+
+    const productsInShop = await Promise.all(
+      sortedProducts.map((id) => this.findOne(id)),
+    );
+
+    return productsInShop;
+  }
+  private async getProductsByCategories(
+    categories: Category[],
+  ): Promise<ProductInShop[]> {
+    const products = await this.productRepository.query(`
+      SELECT p.*, COUNT(pc.category_id) as category_matches
+      FROM product p
+      JOIN product_categories pc ON p.id = pc.product_id
+      WHERE pc.category_id IN (${categories.map((cat) => cat.id).join(',')})
+      GROUP BY p.id
+      ORDER BY category_matches DESC
+    `);
+    const productsInShop =
+      await this.convertListProductsToProductInShop(products);
+    return productsInShop;
+  }
+
+  private async convertListProductsToProductInShop(
+    products: Product[],
+  ): Promise<ProductInShop[]> {
+    const productsInShop: ProductInShop[] = [];
+    for (const product of products) {
+      const productInShop = await this.findOne(product.open_food_fact_id);
+      if (productInShop) {
+        productsInShop.push(productInShop);
+      }
+    }
+    return productsInShop;
   }
 }
