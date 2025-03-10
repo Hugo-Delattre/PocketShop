@@ -145,7 +145,6 @@ export class UserService {
     role: UserRole,
   ): Promise<User> {
     const user: User = new User();
-    console.log(role, updateUserDto);
 
     if (updateUserDto.role && role === UserRole.ADMIN) {
       user.role = updateUserDto.role;
@@ -159,6 +158,20 @@ export class UserService {
     // user.age = updateUserDto.age;
     user.email = updateUserDto.email;
     user.username = updateUserDto.username;
+    user.id = id;
+    return this.userRepository.save(user);
+  }
+
+  async updateUserProfile(
+    id: number,
+    updateUserDto: UpdateUserDto,
+  ): Promise<User> {
+    const user: User = new User();
+
+    user.email = updateUserDto.email;
+    user.username = updateUserDto.username;
+    user.first_name = updateUserDto.first_name;
+    user.last_name = updateUserDto.last_name;
     user.id = id;
     return this.userRepository.save(user);
   }

@@ -45,6 +45,13 @@ export class UserController {
     return this.userService.viewUser(id);
   }
 
+  @Patch('/profile')
+  @Roles(UserRole.USER, UserRole.ADMIN)
+  @UseGuards(RolesGuard)
+  updateProfile(@Body() updateUserDto: UpdateUserDto, @Request() req) {
+    return this.userService.updateUserProfile(req.user.userId, updateUserDto);
+  }
+
   @Patch(':id')
   @Roles(UserRole.ADMIN)
   @UseGuards(RolesGuard)

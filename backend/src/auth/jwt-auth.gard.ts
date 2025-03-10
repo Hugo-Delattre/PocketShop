@@ -1,8 +1,4 @@
-import {
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 import { IS_PUBLIC_KEY } from './data';
@@ -32,13 +28,14 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     const authorization = req.headers.authorization;
 
     if (!authorization) {
-      throw new UnauthorizedException('You do not have permission (Token)');
+      return false;
     }
 
     const token = authorization.split(' ')[1];
     //Token is null or Bad token
+
     if (!token || !this.authService.verify(token)) {
-      throw new UnauthorizedException('You do not have permission (Token)');
+      return false;
     }
 
     //Convert token to jwtPayload object
@@ -48,9 +45,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     const user = await this.authService.findPayloadUser(payload);
 
     if (!user) {
-      throw new UnauthorizedException(
-        'You do not have permission (Authentification)',
-      );
+      return false;
     }
     const result = await super.canActivate(context);
     return result instanceof Observable ? await firstValueFrom(result) : result;
