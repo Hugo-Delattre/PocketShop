@@ -1,10 +1,11 @@
-import { Tabs } from "expo-router";
 import React from "react";
-import { ImageBackground, StyleSheet } from "react-native";
+import { Tabs, useNavigation } from "expo-router";
 
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { lightPrimary, primaryColor } from "@/utils/colors";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -14,16 +15,40 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         tabBarStyle: {
-          backgroundColor: "#0B132B",
+          backgroundColor: primaryColor,
         },
         headerShown: true,
+
+        headerRight: () => {
+          const navigation = useNavigation();
+          return (
+            <TouchableOpacity
+              style={styles.profilePic}
+              //@ts-ignore
+              onPress={() => navigation.navigate("profile")}
+            >
+              <Text style={{ ...styles.white, ...styles.bold }}>LL</Text>
+            </TouchableOpacity>
+          );
+        },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
+          title: "Home page",
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon
+              name={focused ? "home" : "home-outline"}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="scan"
+        options={{
           title: "Scan your product",
-
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
               name={focused ? "barcode" : "barcode-outline"}
@@ -59,8 +84,24 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "red",
+  white: {
+    color: "#FFF",
+    fontSize: 16,
+  },
+  bold: {
+    fontWeight: "700",
+  },
+  profilePic: {
+    borderRadius: "50%",
+    backgroundColor: lightPrimary,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10,
+    marginBottom: 10,
+    width: 40,
+    height: 40,
   },
 });

@@ -1,6 +1,6 @@
 import { ProductInShop, ProductOFF } from "@/constants/interface/Product";
 import { useState, useCallback, useEffect } from "react";
-import getJwt from "@/utils/utils";
+import { getJwtFromStorage } from "@/utils/utils";
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL + "/products";
 const useProductApi = () => {
@@ -8,7 +8,13 @@ const useProductApi = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
   const [jwtToken, setJwtToken] = useState<string | null>(null);
-
+  useEffect(() => {
+    const retrieveJwtToken = async () => {
+      const token = await getJwtFromStorage();
+      setJwtToken(token);
+    };
+    retrieveJwtToken();
+  }, []);
   const addProduct = async (product: any): Promise<any> => {
     setLoading(true);
     try {
@@ -30,7 +36,6 @@ const useProductApi = () => {
     }
   };
   const getProduct = async (id: string): Promise<ProductInShop | null> => {
-    const jwtToken = await getJwt();
     setJwtToken(jwtToken);
     setLoading(true);
 
@@ -49,8 +54,8 @@ const useProductApi = () => {
         throw new Error("Product not found");
       }
       const result = await response.json();
-      console.log("result", result.code);
-      console.log("result", result.product.product_name_fr);
+      // console.log("result", result.code);
+      // console.log("result", result.product.product_name_fr);
       setLoading(false);
       setData(result);
       console.log("loading", loading);
@@ -64,62 +69,62 @@ const useProductApi = () => {
     }
   };
 
-  const updateProduct = async (
-    id: string,
-    product: ProductOFF
-  ): Promise<any | null> => {
-    setLoading(true);
+  // const updateProduct = async (
+  //   id: string,
+  //   product: Product
+  // ): Promise<any | null> => {
+  //   setLoading(true);
 
-    try {
-      const response = await fetch(`${BASE_URL}/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(product),
-      });
-      if (!response.ok) {
-        return null;
-      }
-      const result = await response.json();
-      setData(result);
-      return result;
-    } catch (err) {
-      setError(err as Error);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
+  //   try {
+  //     const response = await fetch(`${BASE_URL}/${id}`, {
+  //       method: "PUT",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(product),
+  //     });
+  //     if (!response.ok) {
+  //       return null;
+  //     }
+  //     const result = await response.json();
+  //     setData(result);
+  //     return result;
+  //   } catch (err) {
+  //     setError(err as Error);
+  //     throw err;
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
-  const deleteProduct = async (id: string): Promise<boolean> => {
-    setLoading(true);
+  // const deleteProduct = async (id: string): Promise<boolean> => {
+  //   setLoading(true);
 
-    try {
-      const response = await fetch(`${BASE_URL}/${id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      return response.ok;
-    } catch (err) {
-      setError(err as Error);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
+  //   try {
+  //     const response = await fetch(`${BASE_URL}/${id}`, {
+  //       method: "DELETE",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //     });
+  //     return response.ok;
+  //   } catch (err) {
+  //     setError(err as Error);
+  //     throw err;
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   return {
     data,
     loading,
     error,
     setLoading,
-    addProduct, //useless
+    // addProduct, //useless
     getProduct,
-    updateProduct, //useless
-    deleteProduct, //useless
+    // updateProduct, //useless
+    // deleteProduct, //useless
   };
 };
 
