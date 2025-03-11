@@ -3,8 +3,8 @@
 // l'id redirige vers la page de paiement paypal
 //https:www.sandbox.paypal.com/checkoutnow?token={id}
 
+import { getJwtFromStorage } from "@/utils/utils";
 import { useState } from "react";
-import getJwt from "@/utils/utils";
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL + "/invoices";
 
@@ -17,7 +17,7 @@ export const usePaypalApi = () => {
     invoiceId: number
   ): Promise<{ paypalUrl: string }> => {
     setLoading(true);
-    const jwtToken = await getJwt();
+    const jwtToken = await getJwtFromStorage();
     console.log("sending request");
 
     try {
