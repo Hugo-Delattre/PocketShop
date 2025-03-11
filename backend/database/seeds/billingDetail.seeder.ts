@@ -13,9 +13,13 @@ export default class BillingDetailSeeder implements Seeder {
     const user = await repository.findOneBy({
       username: 'admin',
     });
+    const user2 = await repository.findOneBy({
+      id: 2,
+    });
 
     const postFactory = await factoryManager.get(BillingDetail);
 
     await postFactory.saveMany(2, { user });
+    await postFactory.saveMany(2, { user: user2 });
   }
 }

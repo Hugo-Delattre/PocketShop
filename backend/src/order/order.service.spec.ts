@@ -4,9 +4,15 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
 import { Repository } from 'typeorm';
 import { PaypalService } from '../paypal/paypal.service';
-import { UpdateOrderDto } from 'src/order/dto/update-order.dto';
-import { CreateOrderDto } from 'src/order/dto/create-order.dto';
+import { UpdateOrderDto } from '../order/dto/update-order.dto';
+import { CreateOrderDto } from '../order/dto/create-order.dto';
 import { ConfigService } from '@nestjs/config';
+import { Product } from '../product/entities/product.entity';
+import { Shop } from '../shop/entities/shop.entity';
+import { InvoiceService } from '../invoices/invoice.service';
+import { ProductService } from '../product/product.service';
+import { InventoryService } from '../inventory/inventory.service';
+import { Inventory } from '../inventory/entities/inventory.entity';
 
 describe('OrderService', () => {
   let service: OrderService;
@@ -53,6 +59,8 @@ describe('OrderService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         OrderService,
+        ProductService,
+        InventoryService,
         {
           provide: PaypalService,
           useValue: mockPaypalService,
@@ -72,8 +80,24 @@ describe('OrderService', () => {
           useValue: mockRepository,
         },
         {
+          provide: getRepositoryToken(Product),
+          useValue: {},
+        },
+        {
+          provide: getRepositoryToken(Shop),
+          useValue: {},
+        },
+        {
+          provide: getRepositoryToken(Inventory),
+          useValue: {},
+        },
+        {
           provide: PaypalService,
           useValue: mockRepositoryPaypal,
+        },
+        {
+          provide: InvoiceService,
+          useValue: {},
         },
       ],
     }).compile();

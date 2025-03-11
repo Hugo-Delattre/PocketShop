@@ -49,8 +49,8 @@ describe('ProductController', () => {
 
   describe('findOne', () => {
     it('should return a product by id', async () => {
-      expect(await controller.findOne(1)).toEqual(mockProduct);
-      expect(service.findOne).toHaveBeenCalledWith(1);
+      expect(await controller.findOne('1')).toEqual(mockProduct);
+      expect(service.findOne).toHaveBeenCalledWith('1');
     });
   });
 

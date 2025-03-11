@@ -13,23 +13,32 @@ export default class UserSeeder implements Seeder {
     const salt = await genSalt();
 
     const password = await hash('Admin1!', salt);
+    const password2 = await hash('Password1!', salt);
 
-    const data = {
-      password,
-      last_name: 'Doe',
-      username: 'admin',
-      isActivated: true,
-      first_name: 'John',
-      role: UserRole.ADMIN,
-      email: 'johndoe@gmail.com',
-    };
+    const data = [
+      {
+        id: 1,
+        password,
+        last_name: 'Doe',
+        username: 'admin',
+        isActivated: true,
+        first_name: 'John',
+        role: UserRole.ADMIN,
+        email: 'johndoe@gmail.com',
+      },
+      {
+        id: 2,
+        password: password2,
+        last_name: 'leDev',
+        username: 'louis',
+        isActivated: true,
+        first_name: 'Louis',
+        role: UserRole.USER,
+        email: 'louis@yalink.fr',
+      },
+    ];
 
-    const user = await repository.findOneBy({ username: data.username });
-
-    // Insert only one record with this username.
-    if (!user) {
-      await repository.insert([data]);
-    }
+    await repository.insert(data);
 
     // ---------------------------------------------------
 
@@ -37,7 +46,7 @@ export default class UserSeeder implements Seeder {
 
     // Insert many records in database.
     await userFactory.saveMany(50, {
-      password,
+      password: password2,
     });
   }
 }
