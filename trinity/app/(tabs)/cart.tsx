@@ -33,7 +33,9 @@ export default function Cart() {
 
   useEffect(() => {
     const fetchCart = async () => {
+      console.log("starting getCart");
       const cart = await getCart(1);
+      console.log("getCart answer:", JSON.stringify(cart, null, 2));
       if (!cart) return;
       setCart(cart);
     };
@@ -77,7 +79,7 @@ export default function Cart() {
           /> */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>
-            {cart?.products.length} differents products for{" "}
+            {cart?.products?.length} differents products for{" "}
           </Text>
           <Text style={styles.headerPrice}>
             <Text style={styles.totalPrice}>{cart?.totalPrice} €</Text>
@@ -88,8 +90,8 @@ export default function Cart() {
         <ScrollView style={styles.scrollArea}>
           {loading ? (
             <Text>loading..</Text>
-          ) : (
-            cart?.products.map((product) => {
+          ) : cart?.products ? (
+            cart.products.map((product) => {
               return (
                 <ProductCard
                   key={product.code}
@@ -98,6 +100,8 @@ export default function Cart() {
                 />
               );
             })
+          ) : (
+            <Text>No products in cart</Text>
           )}
         </ScrollView>
       </View>

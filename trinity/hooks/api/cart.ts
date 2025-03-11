@@ -30,7 +30,7 @@ const useCartApi = () => {
   const addToCart = async (body: AddPayload): Promise<boolean> => {
     setLoading(true);
     if (!jwtToken) {
-      throw new Error('No JWT token found');
+      throw new Error("No JWT token found");
     }
     // console.log("COUCOU", jwtToken);
     try {
@@ -72,10 +72,12 @@ const useCartApi = () => {
       setLoading(false);
     }
   };
+  
   const getCart = async (userId: number): Promise<CartResponseDao> => {
     setLoading(true);
     setJwtToken(jwtToken);
     try {
+      console.log(`GET ${BASE_URL}/${userId}`);
       const response = await fetch(`${BASE_URL}/${userId}`, {
         method: "GET",
         headers: {
@@ -84,13 +86,21 @@ const useCartApi = () => {
         },
       });
       if (!response.ok) {
-        console.error("Error while fetching cart" + response);
+        console.error("Error while fetching cart:", response.status);
       }
       const result = await response.json();
-      const price = getTotalPriceByCart(result.orderId);
+      console.log("result getCart:", JSON.stringify(result, null, 2));
+
+      if (!result.products) {
+        console.warn("products undefined");
+        result.products = [];
+      }
+
+      const price = await getTotalPriceByCart(result.orderId);
       result.totalPrice = price;
       return result;
     } catch (err) {
+      console.error("getCart error:", err);
       setError(err as Error);
       throw err;
     } finally {
