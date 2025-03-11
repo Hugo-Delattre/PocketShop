@@ -25,7 +25,6 @@ import { ConfigModule } from '@nestjs/config';
       password: 'postgres',
       database: 'postgres',
       entities: [__dirname + '/**/*.entity.ts'],
-      synchronize: true, //TODO: Remember to remove this for production
       autoLoadEntities: true,
     }),
     ConfigModule.forRoot({ isGlobal: true }),
