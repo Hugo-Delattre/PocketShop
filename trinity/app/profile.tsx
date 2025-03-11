@@ -8,6 +8,8 @@ import { userAtom } from "@/hooks/auth";
 import { Button, Icon, Input } from "@rneui/themed";
 import { lightPrimary, primaryColor } from "@/utils/colors";
 import { useGetProfile, useUpdateProfile } from "@/hooks/api/profile";
+import { OrdersView } from "@/components/OrdersView";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { logoutUser } from "@/utils/utils";
 
@@ -58,7 +60,7 @@ function profileView() {
   );
 
   return (
-    <View style={styles.pageContainer}>
+    <GestureHandlerRootView style={styles.pageContainer}>
       <View style={styles.profilePicUsernameContainer}>
         <View style={styles.profilePic}>
           <Text style={{ ...styles.white, ...styles.bold }}>{initials}</Text>
@@ -194,7 +196,9 @@ function profileView() {
           </View>
         </View>
       )}
-    </View>
+
+      <OrdersView />
+    </GestureHandlerRootView>
   );
 }
 
@@ -223,6 +227,7 @@ const styles = StyleSheet.create({
   },
   pageContainer: {
     paddingHorizontal: sizes.md,
+    flex: 1,
   },
   header: {
     flexDirection: "row",
