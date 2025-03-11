@@ -14,6 +14,10 @@ export default class OrderSeeder implements Seeder {
     const billing = await repositoryBilling.findOneBy({
       user: { id: user.id },
     });
+    const user2 = await repositoryUser.findOneBy({ id: 2 });
+    const billing2 = await repositoryBilling.findOneBy({
+      user: { id: 2 },
+    });
 
     const paidOrder = new Order();
     paidOrder.billing = billing;
@@ -34,8 +38,8 @@ export default class OrderSeeder implements Seeder {
           1,
       ); // one of the last 7 days;
 
-      order.billing = billing;
-      order.user = user;
+      order.billing = billing2;
+      order.user = user2;
       order.creation_date = creation_date;
       order.is_paid = true;
       order.payment_date = new Date(

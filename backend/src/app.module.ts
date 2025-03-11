@@ -38,7 +38,6 @@ import { ConfigModule } from '@nestjs/config';
     OrderlineModule,
     CartModule,
     BillingDetailsModule,
-    CartModule,
   ],
 
   controllers: [AppController],

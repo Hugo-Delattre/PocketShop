@@ -1,11 +1,14 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, Repository } from 'typeorm';
+import { Between, FindManyOptions, FindOneOptions, Repository } from 'typeorm';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Order } from './entities/order.entity';
 import { PaypalService } from '../paypal/paypal.service';
-import { CreatePaypalOrderDTO } from 'src/order/dto/create-paypal-order.dto';
+import { CreatePaypalOrderDTO } from '../order/dto/create-paypal-order.dto';
+import { Response } from 'express';
+import { ProductService } from '../product/product.service';
+import { InvoiceService } from '../invoices/invoice.service';
 
 @Injectable()
 export class OrderService {
@@ -13,6 +16,8 @@ export class OrderService {
     @InjectRepository(Order)
     private readonly orderRepository: Repository<Order>,
     private readonly paypalService: PaypalService,
+    private readonly productService: ProductService,
+    private readonly invoiceService: InvoiceService,
   ) {}
 
   async create(createOrderDto: CreateOrderDto): Promise<Order> {
@@ -37,7 +42,7 @@ export class OrderService {
       const paypalOrder = await this.paypalService.createPaypalOrder(
         order.total_price,
       );
-      console.log('paypalOrder', paypalOrder);
+      //console.log('paypalOrder', paypalOrder);
 
       order.paypal_order_id = paypalOrder.id;
       order.paypal_status = paypalOrder.status;
@@ -90,15 +95,21 @@ export class OrderService {
     }
   }
 
-  async findAll(): Promise<Order[]> {
-    return this.orderRepository.find();
+  async findAll(options?: FindManyOptions<Order>): Promise<Order[]> {
+    return this.orderRepository.find(options);
   }
   async findAllbyUser(id: number): Promise<Order[]> {
     return this.orderRepository.findBy({ user: { id: id }, is_paid: true });
   }
 
-  async findOne(id: number): Promise<Order | undefined> {
-    const order = await this.orderRepository.findOne({ where: { id } });
+  async findOne(
+    id: number,
+    options: FindOneOptions<Order> = {},
+  ): Promise<Order | undefined> {
+    const order = await this.orderRepository.findOne({
+      where: { id },
+      ...options,
+    });
 
     if (!order) {
       throw new HttpException('Order not found', HttpStatus.NOT_FOUND);
@@ -139,5 +150,70 @@ export class OrderService {
     }, 0);
 
     return total / orders.length;
+  }
+
+  async generateInvoice(orderId: number, res: Response) {
+    try {
+      const order = await this.findOne(orderId, {
+        relations: ['orderlines', 'orderlines.product', 'user', 'billing'],
+      });
+
+      if (!order.is_paid) {
+        res
+          .status(HttpStatus.EXPECTATION_FAILED)
+          .send("The order is not paid, can't generate an invoice");
+      }
+
+      const getProducts = order.orderlines.map(async (orderline) => {
+        const productData = await this.productService.findOne(
+          orderline.product.open_food_fact_id,
+        );
+
+        return {
+          ...orderline,
+          productData,
+        };
+      });
+      const orderlines = await Promise.all(getProducts);
+
+      const invoiceData = {
+        billing: {
+          name: `${order.user.first_name} ${order.user.last_name}`,
+          address: order.billing.address,
+          city: order.billing.city,
+          country: order.billing.country,
+          postal_code: order.billing.zip_code,
+        },
+        invoiceNumber: order.id,
+        totalPaid: Number(order.total_price),
+        products: orderlines.map((orderLine) => ({
+          // @ts-expect-error the type is not correct...
+          name: orderLine.productData.product.product_name,
+          quantity: Number(orderLine.quantity),
+          price_at_order: Number(orderLine.price_at_order),
+        })),
+      };
+      // console.log('invoice data ', invoiceData);
+
+      const pdfBuffer =
+        await this.invoiceService.generateInvoicePdf(invoiceData);
+
+      res.set({
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename=facture-${invoiceData.invoiceNumber}.pdf`,
+        'Content-Length': pdfBuffer.length,
+      });
+
+      res.send({
+        buffer: pdfBuffer,
+        filename: `Invoice-${invoiceData.invoiceNumber}.pdf`,
+      });
+    } catch (error) {
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: 'Error while generating the invoice',
+        error: error.message,
+      });
+    }
   }
 }

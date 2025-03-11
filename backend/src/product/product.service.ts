@@ -69,7 +69,7 @@ export class ProductService {
     });
   }
 
-  async findOne(openFoodFactId: number): Promise<ProductInShop | undefined> {
+  async findOne(openFoodFactId: string): Promise<ProductInShop | undefined> {
     const product = await this.productRepository.findOne({
       where: { open_food_fact_id: String(openFoodFactId) },
     });

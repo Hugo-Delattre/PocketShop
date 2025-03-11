@@ -16,6 +16,7 @@ import { OrderService } from 'src/order/order.service';
 import { UserService } from 'src/user/user.service';
 import { KpiController } from 'src/kpi/kpi.controller';
 import { PaypalService } from 'src/paypal/paypal.service';
+import { InvoiceService } from 'src/invoices/invoice.service';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { PaypalService } from 'src/paypal/paypal.service';
     KpiService,
     UserService,
     PaypalService,
+    InvoiceService,
   ],
   exports: [CartService],
 })

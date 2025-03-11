@@ -31,7 +31,7 @@ export class ProductController {
   }
 
   @Get(':openFoodFactId')
-  findOne(@Param('openFoodFactId') openFoodFactId: number) {
+  findOne(@Param('openFoodFactId') openFoodFactId: string) {
     return this.productService.findOne(openFoodFactId);
   }
 
