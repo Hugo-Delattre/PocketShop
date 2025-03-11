@@ -6,8 +6,10 @@ import { Product } from '../product/entities/product.entity';
 import { Inventory } from '../inventory/entities/inventory.entity';
 import { User } from '../user/entities/user.entity';
 import { Shop } from '../shop/entities/shop.entity';
-import { ShopService } from 'src/shop/shop.service';
-import { InventoryService } from 'src/inventory/inventory.service';
+import { ShopService } from '../shop/shop.service';
+import { InventoryService } from '../inventory/inventory.service';
+import { Orderline } from '../orderline/entities/orderline.entity';
+import { Category } from './entities/category.entity';
 
 @Module({
   imports: [
@@ -15,6 +17,8 @@ import { InventoryService } from 'src/inventory/inventory.service';
     TypeOrmModule.forFeature([Inventory]),
     TypeOrmModule.forFeature([User]),
     TypeOrmModule.forFeature([Shop]),
+    TypeOrmModule.forFeature([Orderline]),
+    TypeOrmModule.forFeature([Category]),
   ],
   controllers: [ProductController],
   providers: [ProductService, ShopService, InventoryService],

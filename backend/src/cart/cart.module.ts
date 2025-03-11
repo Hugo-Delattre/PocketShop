@@ -17,6 +17,7 @@ import { UserService } from 'src/user/user.service';
 import { KpiController } from 'src/kpi/kpi.controller';
 import { PaypalService } from 'src/paypal/paypal.service';
 import { InvoiceService } from 'src/invoices/invoice.service';
+import { Category } from '../product/entities/category.entity';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { InvoiceService } from 'src/invoices/invoice.service';
     TypeOrmModule.forFeature([Product]),
     TypeOrmModule.forFeature([Inventory]),
     TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([Category]),
   ],
   controllers: [CartController, KpiController],
   providers: [

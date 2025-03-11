@@ -3,6 +3,17 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { config } from 'dotenv';
+import * as fs from 'fs';
+import { Logger } from '@nestjs/common';
+
+// const logStream = fs.createWriteStream('/app/logs/app.log', { flags: 'a'});
+// Logger.overrideLogger({
+//   log: (msg) => logStream.write(`[LOG] ${msg}\n`),
+//   error: (msg) => logStream.write(`[ERROR] ${msg}\n`),
+//   warn: (msg) => logStream.write(`[WARN] ${msg}\n`),
+//   debug: (msg) => logStream.write(`[DEBUG] ${msg}\n`),
+//   verbose: (msg) => logStream.write(`[VERBOSE] ${msg}\n`),
+// });
 
 config({ path: '.env.local' });
 
@@ -22,6 +33,8 @@ async function bootstrap() {
     'http://209.38.247.123:3000',
     'http://209.38.247.123:8080',
     'http://209.38.247.123:3002',
+    'https://trinitybdx1.works',
+    'https://trinity-backoffice.vercel.app',
   ];
   app.enableCors({
     origin: (origin, callback) => {

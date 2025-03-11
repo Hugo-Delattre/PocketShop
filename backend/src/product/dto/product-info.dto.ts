@@ -17,9 +17,10 @@ export interface ProductOFF {
   generic_name_fr: string;
   ingredients_text: string;
   link: string;
-  categories: string[];
+  categories: string;
   ingredients: string[];
-  allergens: string[];
+  allergens: string;
+  origins: string;
   image_url: string;
   quantity: string;
   nutriments: Nutriments;

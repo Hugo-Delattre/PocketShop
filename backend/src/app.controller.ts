@@ -55,6 +55,6 @@ export class AppController {
 
   @Get('profile')
   async getProfile(@Request() req) {
-    return this.userService.viewUser(req.userId);
+    return this.userService.viewUser(req.user.userId);
   }
 }

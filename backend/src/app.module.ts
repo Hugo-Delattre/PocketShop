@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
@@ -13,22 +14,27 @@ import { OrderlineModule } from './orderline/orderline.module';
 import { InventoryModule } from './inventory/inventory.module';
 import { BillingDetailsModule } from './billing-details/billing-details.module';
 import { CartModule } from './cart/cart.module';
-import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'db',
-      port: 5432,
-      username: 'postgres',
-      password: 'postgres',
-      database: 'postgres',
-      entities: [__dirname + '/**/*.entity.ts'],
-      synchronize: true, //TODO: Remember to remove this for production
-      autoLoadEntities: true,
+    ConfigModule.forRoot({ isGlobal: true }), // Charge les variables d'env
+
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule], // Charge ConfigModule
+      useFactory: async (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get<string>('DB_HOST'),
+        port: configService.get<number>('DB_PORT'),
+        username: configService.get<string>('DB_USER'),
+        password: configService.get<string>('DB_PASSWORD'),
+        database: configService.get<string>('DB_NAME'),
+        ssl: { rejectUnauthorized: false },
+        autoLoadEntities: true,
+        synchronize: false, // Mets `true` en dev uniquement
+      }),
+      inject: [ConfigService], // Injecte ConfigService
     }),
-    ConfigModule.forRoot({ isGlobal: true }),
+
     UserModule,
     AuthModule,
     ProductModule,
@@ -39,7 +45,6 @@ import { ConfigModule } from '@nestjs/config';
     CartModule,
     BillingDetailsModule,
   ],
-
   controllers: [AppController],
   providers: [
     AppService,
