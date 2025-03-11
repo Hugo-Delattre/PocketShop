@@ -8,6 +8,8 @@ import { userAtom } from "@/hooks/auth";
 import { Button, Icon, Input } from "@rneui/themed";
 import { lightPrimary, primaryColor } from "@/utils/colors";
 import { useGetProfile, useUpdateProfile } from "@/hooks/api/profile";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { logoutUser } from "@/utils/utils";
 
 function profileView() {
   const { mutateAsync: updateProfile } = useUpdateProfile();
@@ -73,7 +75,7 @@ function profileView() {
               Member since : {accountCreationDate}
             </Text>
           </View>
-          <View style={{ marginTop: sizes.sm }}>
+          <View style={styles.buttonContainer}>
             <Button
               type="outline"
               buttonStyle={{ width: 120 }}
@@ -82,6 +84,18 @@ function profileView() {
             >
               <Text>Edit</Text>
               <Icon name="edit" size={18} style={{ marginLeft: sizes.xs }} />
+            </Button>
+
+            <Button
+              onPress={logoutUser}
+              buttonStyle={{
+                width: 120,
+              }}
+              radius="md"
+              type="outline"
+            >
+              <Text style={styles.logoutText}>Déconnexion</Text>
+              <MaterialCommunityIcons name="logout" size={24} />
             </Button>
           </View>
         </>
@@ -209,5 +223,29 @@ const styles = StyleSheet.create({
   },
   pageContainer: {
     paddingHorizontal: sizes.md,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: sizes.md,
+  },
+  logoutButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f8d7da",
+    padding: 10,
+    borderRadius: 8,
+  },
+  logoutText: {
+    marginLeft: 5,
+    fontWeight: "500",
+  },
+  buttonContainer: {
+    marginTop: sizes.sm,
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    gap: sizes.md,
   },
 });
