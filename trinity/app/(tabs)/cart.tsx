@@ -53,7 +53,7 @@ export default function Cart() {
       console.error("Erreur lors du paiement PayPal :", err);
     }
   };
-  
+
   const handleNavigationStateChange = (navState: { url: string }) => {
     const { url } = navState;
     console.log("URL détectée :", url);
@@ -63,7 +63,7 @@ export default function Cart() {
       //TODO: Success logic
     } else if (url.startsWith("trinity://payment-cancel")) {
       console.log("Paiement annulé !");
-      setShowPaymentModal(false); 
+      setShowPaymentModal(false);
       //TODO: Cancel logic
     }
   };
