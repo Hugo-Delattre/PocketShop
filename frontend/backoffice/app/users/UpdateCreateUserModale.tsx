@@ -71,7 +71,7 @@ export default function UpdateCreateUserModal({
         </DialogHeader>
         <form className="flex flex-col gap-4 py-4">
           <div className="">
-            <Label htmlFor="openFoodFactId" className="text-right">
+            <Label htmlFor="username" className="text-right">
               Username
             </Label>
             <Input
@@ -135,7 +135,7 @@ export default function UpdateCreateUserModal({
             />
           </div>
           {isAdmin && (
-            <div className="">
+            <div>
               <Label htmlFor="role" className="text-right">
                 Role
               </Label>
@@ -149,7 +149,7 @@ export default function UpdateCreateUserModal({
                   }))
                 }
               >
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-[180px]" aria-label="Role">
                   <SelectValue placeholder="Role" />
                 </SelectTrigger>
                 <SelectContent>
