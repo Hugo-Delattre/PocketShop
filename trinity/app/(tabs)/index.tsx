@@ -1,9 +1,27 @@
+import { ProductOFF, ProductInShop } from "@/constants/interface/Product";
+import {
+  CameraView,
+  CameraType,
+  useCameraPermissions,
+  Camera,
+  BarcodeScanningResult,
+} from "expo-camera";
+import { useEffect, useRef, useState } from "react";
+import { Button } from "@rneui/themed";
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  Image,
+  SafeAreaView,
+  AppState,
+} from "react-native";
+import { Audio } from "expo-av";
+import useProductApi from "@/hooks/api/product";
+import { router, usePathname, useRouter, useSegments } from "expo-router";
 import React from "react";
-import { userAtom } from "@/hooks/auth";
-import { sizes } from "@/utils/sizes";
-import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { useAtomValue } from "jotai";
+import { Dimensions } from "react-native";
 
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -60,7 +78,7 @@ function index() {
   );
 }
 
-export default index;
+const { width, height } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
   h1: {
@@ -83,6 +101,15 @@ const styles = StyleSheet.create({
   },
   flex: {
     display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    width: width * 0.8,
+    height: height * 0.5,
+    margin: 5,
+  },
+  buttonContainer: {
+    flex: 1,
     flexDirection: "row",
     gap: sizes.sm,
     flexWrap: "nowrap",
