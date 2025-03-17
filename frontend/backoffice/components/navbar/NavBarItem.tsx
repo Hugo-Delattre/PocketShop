@@ -42,8 +42,10 @@ export function NavBarItem({ route }: { route: keyof typeof routes }) {
         className={`bg-blue hover:bg-transparentBlue ${
           isActive ? "bg-lightBlue" : ""
         } rounded-lg transition-colors w-full h-full grid place-items-center`}
+         arial-label={`${route} link`}
       >
-        <Icon className="stroke-white" />
+        <Icon className="stroke-white"/>
+        <span className="sr-only">{route}</span>
       </Link>
     </li>
   );

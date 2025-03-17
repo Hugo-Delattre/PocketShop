@@ -24,14 +24,19 @@ export default function Navbar() {
       </ul>
       <div className="space-y-4 w-full">
         <DropdownMenu>
-          <DropdownMenuTrigger className="grid place-items-center w-full aspect-square">
-            <CircleUserRoundIcon className="stroke-white w-7 h-7" />
+          <DropdownMenuTrigger className="grid place-items-center w-full aspect-square"       
+            aria-label="User menu" // Accessible name for the trigger
+            aria-haspopup="true" // Indicates the button opens a menu
+            aria-expanded="false" // Dynamically update this based on menu state
+          >
+            <CircleUserRoundIcon className="stroke-white w-7 h-7" aria-hidden="true" />
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem>
               <Link
                 href="/login"
                 className={buttonVariants({ variant: "ghost" })}
+                aria-label="Login"
               >
                 Login
               </Link>
@@ -40,12 +45,13 @@ export default function Navbar() {
               <Link
                 href="/register"
                 className={buttonVariants({ variant: "ghost" })}
+                aria-label="Signup"
               >
                 Signup
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <NavbarLogOut />
+              <NavbarLogOut aria-label="Logout"/>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

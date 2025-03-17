@@ -31,8 +31,9 @@ export function TableFooterActions({
         </span>
         <div className="flex items-center justify-end space-x-8">
           <div>
-            <p className="inline">Show by</p>
+            <label htmlFor="pageSize" className="inline">Show by</label>
             <select
+              id="pageSize"
               value={pageSize}
               onChange={(e) => setPageSize(Number(e.target.value))}
               className="border rounded p-1 ml-2 inline-block"

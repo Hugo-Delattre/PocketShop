@@ -22,7 +22,7 @@ export default function RootLayout({
             gridTemplateColumns: "5rem auto",
             gridTemplateRows: "100vh",
           }}
-          className={`${karla.className} ${karla.variable} ${crimson.variable} h-full antialiased vsc-initialized h-full grid `}
+          className={`${karla.className} ${karla.variable} ${crimson.variable} h-full antialiased vsc-initialized grid `}
         >
           <div className="col-start-1">
             <Navbar />
