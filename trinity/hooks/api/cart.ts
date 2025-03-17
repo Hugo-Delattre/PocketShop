@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
-import { getJwtFromStorage } from "@/utils/utils";
+import { useState } from "react";
 import { CartResponseDao } from "@/constants/interface/Cart";
+import { getJwtFromStorage } from "@/hooks/auth";
+
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL + "/carts";
 const INVOICE_URL = process.env.EXPO_PUBLIC_API_URL + "/invoices";
 export type AddPayload = {
@@ -18,31 +19,27 @@ export type removePayload = {
 const useCartApi = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
-  const [jwtToken, setJwtToken] = useState<string | null>(null);
-  useEffect(() => {
-    const retrieveJwtToken = async () => {
-      const token = await getJwtFromStorage();
-      setJwtToken(token);
-    };
-    retrieveJwtToken();
-  }, []);
 
   const addToCart = async (body: AddPayload): Promise<boolean> => {
     setLoading(true);
-    if (!jwtToken) {
-      throw new Error("No JWT token found");
-    }
-    // console.log("COUCOU", jwtToken);
+
     try {
+      const token = await getJwtFromStorage();
+
+      if (!token) {
+        throw new Error("No JWT token found");
+      }
+      console.log("addToCart JWT:", token);
+
       const response = await fetch(`${BASE_URL}/add`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer " + jwtToken,
+          Authorization: `Bearer${token}`,
         },
         body: JSON.stringify(body),
       });
-      // console.log("response", response);
+
       return response.ok;
     } catch (err) {
       setError(err as Error);
@@ -54,13 +51,19 @@ const useCartApi = () => {
 
   const removeFromCart = async (body: removePayload): Promise<boolean> => {
     setLoading(true);
-    setJwtToken(jwtToken);
     try {
+      const token = await getJwtFromStorage();
+
+      if (!token) {
+        throw new Error("No JWT token found");
+      }
+
+      console.log("removeFromCart JWT:", token);
       const response = await fetch(`${BASE_URL}/remove`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer " + jwtToken,
+          Authorization: "Bearer" + token,
         },
         body: JSON.stringify(body),
       });
@@ -72,21 +75,27 @@ const useCartApi = () => {
       setLoading(false);
     }
   };
-  
+
   const getCart = async (userId: number): Promise<CartResponseDao> => {
     setLoading(true);
-    setJwtToken(jwtToken);
     try {
       console.log(`GET ${BASE_URL}/${userId}`);
+      const token = await getJwtFromStorage();
+      if (!token) {
+        throw new Error("No JWT token found");
+      }
       const response = await fetch(`${BASE_URL}/${userId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer " + jwtToken,
+          Authorization: `Bearer ${token}`,
         },
       });
+      console.log("getCart JWT", `Bearer ${token}`);
+
       if (!response.ok) {
         console.error("Error while fetching cart:", response.status);
+        throw new Error(`HTTP error! Status: ${response.status}`);
       }
       const result = await response.json();
       console.log("result getCart:", JSON.stringify(result, null, 2));
@@ -109,13 +118,18 @@ const useCartApi = () => {
   };
   const getTotalPriceByCart = async (orderId: number): Promise<Number> => {
     setLoading(true);
-    setJwtToken(jwtToken);
     try {
+      const token = await getJwtFromStorage();
+      if (!token) {
+        throw new Error("No JWT token found");
+      }
+      console.log("getTotalPriceByCart JWT:", token);
+
       const response = await fetch(`${INVOICE_URL}/${orderId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer " + jwtToken,
+          Authorization: `Bearer ${token}`,
         },
       });
       if (!response.ok) {
@@ -129,7 +143,7 @@ const useCartApi = () => {
     } finally {
       setLoading(false);
     }
-  }
+  };
   return { loading, error, addToCart, getCart, removeFromCart };
 };
 export default useCartApi;

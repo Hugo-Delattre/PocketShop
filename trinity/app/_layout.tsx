@@ -1,20 +1,17 @@
 import {
   DarkTheme,
   DefaultTheme,
-  NavigationContainer,
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Redirect, Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 import React from "react";
-import useAuth, { loadableUserAtom } from "../hooks/auth";
-import LoginScreen from "@/screens/LoginScreen";
-import { useAtomValue } from "jotai";
+import useAuth from "../hooks/auth";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Karla_400Regular,
@@ -25,17 +22,25 @@ import {
 import { CrimsonText_400Regular } from "@expo-google-fonts/crimson-text";
 import { Text } from "react-native";
 import PayPalRedirectHandler from "@/components/PaypalRedirectHandler";
+import { useAtomValue } from "jotai";
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
 
+function AuthenticationGuard({ children }: { children: React.ReactNode }) {
+  const { atomIsAuthenticated } = useAuth();
+  const isAuthenticated = useAtomValue(atomIsAuthenticated);
+  console.warn("atomIsAuthenticated:", atomIsAuthenticated);
+  console.warn("isAuthenticated:", isAuthenticated);
+  if (!atomIsAuthenticated) {
+    return <Redirect href="/(auth)/login" />;
+  }
+  return <>{children}</>;
+}
+
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  const { atomIsAuthenticated, getUserTokenFromStorage } = useAuth();
-  const isAuthenticated = useAtomValue(atomIsAuthenticated);
-  const connectedUser = useAtomValue(loadableUserAtom);
 
   const [loaded] = useFonts({
     Karla_400Regular,
@@ -51,24 +56,31 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
-  if (!loaded || connectedUser.state === "loading") {
+  if (!loaded) {
     return <Text>Loading...</Text>;
-  }
-
-  if (!isAuthenticated) {
-    return <LoginScreen />; // Render the login screen if the user is not authenticated
   }
 
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <NavigationContainer>
-        <PayPalRedirectHandler />
-      </NavigationContainer>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
+        <AuthenticationGuard>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="(auth)/login"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="profile"
+              options={{
+                title: "Mon Profil",
+                headerShown: true,
+              }}
+            />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+          <PayPalRedirectHandler />
+        </AuthenticationGuard>
       </ThemeProvider>
     </QueryClientProvider>
   );

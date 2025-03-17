@@ -1,10 +1,7 @@
 import React, { useEffect } from "react";
 import * as Linking from "expo-linking";
-import { useNavigation } from "@react-navigation/native";
 
 export default function PayPalRedirectHandler() {
-  const navigation = useNavigation();
-
   useEffect(() => {
     const handleRedirect = ({ url }: { url: string }) => {
       if (url.startsWith("myapp://paypal-success")) {

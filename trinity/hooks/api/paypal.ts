@@ -3,7 +3,7 @@
 // l'id redirige vers la page de paiement paypal
 //https:www.sandbox.paypal.com/checkoutnow?token={id}
 
-import { getJwtFromStorage } from "@/utils/utils";
+import { getJwtFromStorage } from "@/hooks/auth";
 import { useState } from "react";
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL + "/invoices";
@@ -17,15 +17,22 @@ export const usePaypalApi = () => {
     invoiceId: number
   ): Promise<{ paypalUrl: string }> => {
     setLoading(true);
-    const jwtToken = await getJwtFromStorage();
+    const token = await getJwtFromStorage();
+    if (!token) {
+      console.error("JWT missing for PayPal payment");
+      throw new Error("Authentication required");
+    }
+
     console.log("sending request");
 
     try {
+      console.log("PAYPAL API CALL JWT TOKEN: ", "Bearer" + token);
+
       const response = await fetch(`${BASE_URL}/${invoiceId}/paypal`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer " + jwtToken,
+          Authorization: `Bearer ${token}`,
         },
       });
 

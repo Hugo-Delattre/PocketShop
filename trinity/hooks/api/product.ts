@@ -1,6 +1,6 @@
-import { ProductInShop, ProductOFF } from "@/constants/interface/Product";
-import { useState, useCallback, useEffect } from "react";
-import { getJwtFromStorage } from "@/utils/utils";
+import { ProductInShop } from "@/constants/interface/Product";
+import { useState, useEffect } from "react";
+import { getJwtFromStorage } from "@/hooks/auth";
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL + "/products";
 const useProductApi = () => {
