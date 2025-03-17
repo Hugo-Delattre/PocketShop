@@ -1,8 +1,10 @@
 import { UserRole } from "@/queries/user";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { atom } from "jotai";
+import { router } from "expo-router";
+import { atom, useSetAtom } from "jotai";
 import { loadable } from "jotai/utils";
 import { jwtDecode } from "jwt-decode";
+import { Alert } from "react-native";
 
 const apiBaseUrl = process.env.EXPO_PUBLIC_API_URL;
 // const apiBaseUrl = "https://e295-163-5-3-134.ngrok-free.app";
@@ -28,14 +30,19 @@ export const atomIsAuthenticated = atom((get) => {
 async function removeJwtFromStorage() {
   await AsyncStorage.removeItem("jwt");
 }
-async function getUserTokenFromStorage() {
-  const jwt = await AsyncStorage.getItem("jwt");
-  if (!jwt) {
-    console.error("No token found");
+export async function getUserTokenFromStorage() {
+  try {
+    const jwt = await AsyncStorage.getItem("jwt");
+    if (!jwt) {
+      console.error("No token found");
+      return null;
+    }
+    const decodedToken: JWT_User = jwtDecode(jwt);
+    return decodedToken;
+  } catch (error) {
+    console.error("Error getting user token:", error);
     return null;
   }
-  const decodedToken: JWT_User = jwtDecode(jwt);
-  return decodedToken;
 }
 async function saveJwtInStorage(jwt: string) {
   await AsyncStorage.setItem("jwt", jwt);
@@ -43,6 +50,17 @@ async function saveJwtInStorage(jwt: string) {
   console.log("jwt", jwt);
   console.log("local storage : " + (await AsyncStorage.getItem("jwt")));
 }
+
+export const getJwtFromStorage = async (): Promise<string | null> => {
+  try {
+    const token = await AsyncStorage.getItem("jwt");
+    return token;
+  } catch (error) {
+    console.error("Erreur lors de la récupération du JWT:", error);
+    return null;
+  }
+};
+
 type creds = {
   username: string;
   password: string;
@@ -66,13 +84,64 @@ async function fetchJwtToken(creds: creds): Promise<string> {
   return data.access_token;
 }
 
+export const useLogout = () => {
+  const setUser = useSetAtom(userAtom);
+
+  return async (): Promise<void> => {
+    try {
+      console.log("Déconnexion de l'utilisateur...");
+      await AsyncStorage.removeItem("jwt");
+
+      setUser(null);
+
+      const remainingToken = await AsyncStorage.getItem("jwt");
+      if (remainingToken === null) {
+        console.log("Utilisateur déconnecté avec succès");
+        router.replace("/login");
+      } else {
+        console.error("Échec de la déconnexion: le token est toujours présent");
+        Alert.alert("Erreur", "Une erreur est survenue lors de la déconnexion");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la déconnexion:", error);
+      Alert.alert("Erreur", "Une erreur est survenue lors de la déconnexion");
+    }
+  };
+};
+
+export async function getUserIdFromJwt(): Promise<number | null> {
+  try {
+    const jwt = await AsyncStorage.getItem("jwt");
+    if (!jwt) {
+      console.log("Pas de token trouvé pour récupérer l'ID utilisateur");
+      return null;
+    }
+    const decodedToken: JWT_User = jwtDecode(jwt);
+    const currentTime = Date.now() / 1000;
+    if (decodedToken.exp && decodedToken.exp < currentTime) {
+      console.log("Token expiré");
+      await removeJwtFromStorage();
+      return null;
+    }
+    return decodedToken.sub;
+  } catch (error) {
+    console.error("Erreur lors de la récupération de l'ID utilisateur:", error);
+    return null;
+  }
+}
+
 const useAuth = () => {
+  const logout = useLogout();
+
   return {
     atomIsAuthenticated,
     fetchJwtToken,
     saveJwtInStorage,
     removeJwtFromStorage,
     getUserTokenFromStorage,
+    getJwtFromStorage,
+    getUserIdFromJwt,
+    logout,
   };
 };
 export default useAuth;

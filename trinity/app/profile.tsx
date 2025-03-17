@@ -11,10 +11,11 @@ import { useGetProfile, useUpdateProfile } from "@/hooks/api/profile";
 import { OrdersView } from "@/components/OrdersView";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { logoutUser } from "@/utils/utils";
+import { useLogout } from "@/hooks/auth";
 
 function profileView() {
   const { mutateAsync: updateProfile } = useUpdateProfile();
+  const logout = useLogout();
   const [isEditing, setIsEditing] = useState(false);
 
   const [userAtomValue, setUserAtom] = useAtom(userAtom);
@@ -89,7 +90,7 @@ function profileView() {
             </Button>
 
             <Button
-              onPress={logoutUser}
+              onPress={logout}
               buttonStyle={{
                 width: 120,
               }}

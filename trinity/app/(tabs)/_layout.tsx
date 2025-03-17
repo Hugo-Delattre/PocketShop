@@ -1,5 +1,5 @@
 import React from "react";
-import { Tabs, useNavigation } from "expo-router";
+import { Tabs, useRouter } from "expo-router";
 
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { Colors } from "@/constants/Colors";
@@ -9,6 +9,7 @@ import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const router = useRouter();
 
   return (
     <Tabs
@@ -20,12 +21,11 @@ export default function TabLayout() {
         headerShown: true,
 
         headerRight: () => {
-          const navigation = useNavigation();
           return (
             <TouchableOpacity
               style={styles.profilePic}
               //@ts-ignore
-              onPress={() => navigation.navigate("profile")}
+              onPress={() => router.push("/profile")}
             >
               <Text style={{ ...styles.white, ...styles.bold }}>LL</Text>
             </TouchableOpacity>

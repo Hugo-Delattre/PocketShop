@@ -34,7 +34,7 @@ export default function Cart() {
   useEffect(() => {
     const fetchCart = async () => {
       console.log("starting getCart");
-      const cart = await getCart(1);
+      const cart = await getCart(52);
       console.log("getCart answer:", JSON.stringify(cart, null, 2));
       if (!cart) return;
       setCart(cart);
@@ -45,7 +45,7 @@ export default function Cart() {
   const handlePaypalPayment = async () => {
     console.log("handlePaypalPayment");
     try {
-      const paypalResponse = await initiatePaypalPayment(2); //We will have to use order.id instead, for now i've just used an hardcoded value
+      const paypalResponse = await initiatePaypalPayment(109); //We will have to use order.id instead, for now i've just used an hardcoded value
       if (paypalResponse?.paypalUrl) {
         console.log("Redirection vers PayPal :", paypalResponse.paypalUrl);
         setPaypalUrl(paypalResponse.paypalUrl);
