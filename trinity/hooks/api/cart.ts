@@ -98,7 +98,9 @@ const useCartApi = () => {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
       const result = await response.json();
-      console.log("result getCart:", JSON.stringify(result, null, 2));
+      console.log(
+        `getCart userId: ${result.userId}, getCard orderId: ${result.orderId}`
+      );
 
       if (!result.products) {
         console.warn("products undefined");
