@@ -1,5 +1,9 @@
 import React, { useState } from "react";
-import { useGetInvoicePdf, useGetPaidOrders } from "@/hooks/api/order";
+import {
+  useGetInvoicePdf,
+  useGetOrders,
+  useGetPaidOrders,
+} from "@/hooks/api/order";
 import { Feather } from "@expo/vector-icons";
 import { Button } from "@rneui/base";
 
@@ -10,7 +14,8 @@ import { ScrollView } from "react-native-gesture-handler";
 import { primaryColor } from "@/utils/colors";
 
 export function OrdersView() {
-  const { data, isLoading, error } = useGetPaidOrders();
+  // TODO: Replace useGetOrders with useGetPaidOrders when ready
+  const { data, isLoading, error } = useGetOrders();
 
   const [isInvoiceLimited, setIsInvoiceLimited] = useState(true);
 
@@ -70,7 +75,7 @@ function PaidOrder({ order }: { order: TPaidOrder }) {
     >
       {error && <Text>{String(error)}</Text>}
       <Text>{paymentData}</Text>
-      <Text>{order.total_price} €</Text>
+      <Text>{parseFloat(order.total_price).toFixed(2)} €</Text>
       <Button
         type="outline"
         onPress={() => downloadInvoice(order.id)}

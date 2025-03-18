@@ -1,6 +1,7 @@
 import {
   type GenerateInvoice,
   generateInvoice,
+  getOrders,
   getPaidOrders,
   PaidOrder,
 } from "@/queries/order";
@@ -35,6 +36,21 @@ export function useGetPaidOrders(params?: {
     queryKey: ["getPaidOrders"],
     queryFn: async () => {
       const res = await getPaidOrders();
+
+      if (onSuccess) onSuccess(res.data);
+      return res.data;
+    },
+  });
+}
+
+export function useGetOrders(params?: {
+  onSuccess?: (value: PaidOrder[]) => void;
+}) {
+  const { onSuccess } = params || {};
+  return useQuery({
+    queryKey: ["getOrders"],
+    queryFn: async () => {
+      const res = await getOrders();
 
       if (onSuccess) onSuccess(res.data);
       return res.data;
