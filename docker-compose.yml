@@ -1,25 +1,4 @@
 services:
-  app:
-    build:
-      context: ./backend
-      dockerfile: ${DOCKERFILE}
-    container_name: nest
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=${NODE_ENV}
-      - JWT_SECRET=${JWT_SECRET}
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
-    volumes:
-      - ${PWD}/backend:/app
-      - /app/node_modules
-      - ${PWD}/backend/logs:/app/logs
-    restart: always
-
   prometheus:
     container_name: prometheus
     image: prom/prometheus
