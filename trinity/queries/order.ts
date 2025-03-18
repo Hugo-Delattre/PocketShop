@@ -28,3 +28,10 @@ export const getPaidOrders = async () => {
     url: `/invoices/paid`,
   });
 };
+
+export const getOrders = async () => {
+  return await apiClient<PaidOrder[]>({
+    method: "GET",
+    url: `/invoices`,
+  });
+}
