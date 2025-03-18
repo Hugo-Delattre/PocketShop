@@ -6,6 +6,7 @@ import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { lightPrimary, primaryColor } from "@/utils/colors";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -22,12 +23,21 @@ export default function TabLayout() {
 
         headerRight: () => {
           return (
-            <TouchableOpacity
-              style={styles.profilePic}
-              //@ts-ignore
-              onPress={() => router.push("/profile")}
-            >
-              <Text style={{ ...styles.white, ...styles.bold }}>LL</Text>
+            <TouchableOpacity style={styles.headerRightContainer}>
+              <TouchableOpacity
+                style={styles.profilePic}
+                onPress={() => router.push("/profile")}
+              >
+                <Text style={{ ...styles.white, ...styles.bold }}>LL</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.logoutIcon}
+                onPress={() => router.push("/(auth)/login")}
+              >
+                <Text style={{ ...styles.bold }}>
+                  <MaterialCommunityIcons name="logout" size={24} />
+                </Text>
+              </TouchableOpacity>
             </TouchableOpacity>
           );
         },
@@ -94,14 +104,25 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   profilePic: {
-    borderRadius: "50%",
+    borderRadius: 20,
     backgroundColor: lightPrimary,
-    display: "flex",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 10,
-    marginBottom: 10,
     width: 40,
+    height: 40,
+  },
+  headerRightContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginRight: 10,
+  },
+  logoutIcon: {
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: -10,
+    width: 50,
     height: 40,
   },
 });
