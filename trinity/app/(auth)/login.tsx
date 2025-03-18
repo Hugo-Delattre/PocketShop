@@ -4,6 +4,7 @@ import { View, Text, TextInput, Button, StyleSheet } from "react-native";
 import useAuth, { JWT_User, userAtom } from "@/hooks/auth";
 import { jwtDecode } from "jwt-decode";
 import { useSetAtom } from "jotai";
+import { useRouter } from "expo-router";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -13,6 +14,7 @@ export default function Login() {
 
   const setUser = useSetAtom(userAtom);
   const auth = useAuth();
+  const router = useRouter();
 
   const handleLogin = async () => {
     if (!username || !password) {
@@ -34,6 +36,7 @@ export default function Login() {
       setError("Invalid username or password");
     } finally {
       setIsLoading(false);
+      router.push("/(tabs)");
     }
   };
 
