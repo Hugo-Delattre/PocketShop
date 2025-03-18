@@ -21,6 +21,7 @@ import { ProductInShop } from '../product/dto/product-info.dto';
 import { CreateOrderlineDto } from '../orderline/dto/create-orderline.dto';
 import { KpiService } from '../kpi/kpi.service';
 import { BillingDetail } from 'src/billing-details/entities/billing-detail.entity';
+import { ShortCartResponseDao } from './dao/short-cart-info';
 
 @Injectable()
 export class CartService {
@@ -72,6 +73,7 @@ export class CartService {
     console.log('Price : ' + price);
     const order = await this.orderRepository.findOne({
       where: { id: orderId },
+      relations: ['user'],
     });
 
     if (!order) {
@@ -86,7 +88,7 @@ export class CartService {
     orderLine.product = product;
     orderLine.order = order;
     await this.orderlineRepository.save(orderLine);
-    console.log('tata: ' + JSON.stringify(JSON.stringify(order)));
+    console.log('tata: ' + JSON.stringify(order));
     order.user = await this.userRepository.findOne({
       where: { id: order.user.id },
     });
@@ -240,7 +242,10 @@ export class CartService {
               order.id,
               addProductDto.shopId,
             );
-            return true;
+            return {
+              statusCode: 201,
+              data: await this.getCartInfos(addProductDto.userId),
+            };
           }
           this.updateQuantityOrderline(
             order,
@@ -249,7 +254,10 @@ export class CartService {
             addProductDto.shopId,
             1,
           );
-          return true;
+          return {
+            statusCode: 200,
+            data: await this.getCartInfos(addProductDto.userId),
+          };
         } else {
           console.log('order doesnt have product');
           await this.newOrdelineByNewProduct(
@@ -257,13 +265,17 @@ export class CartService {
             addProductDto.orderId,
             addProductDto.shopId,
           );
-          return true;
+          return {
+            statusCode: 200,
+            data: await this.getCartInfos(addProductDto.userId),
+          };
         }
       }
     } catch (error) {
       throw error;
     }
-    return true;
+    console.log('Returning cart');
+    return this.getCart(addProductDto.userId);
   }
 
   async removeFromCart(removeProductDto: RemoveProductDto) {
@@ -332,6 +344,20 @@ export class CartService {
       cart.products.push({ ...productInfos, ...productStorageInfos });
     }
     return cart;
+  }
+
+  async getCartInfos(userId: number): Promise<ShortCartResponseDao> {
+    const cart = await this.getCart(userId);
+    const returnedCart = new ShortCartResponseDao();
+    returnedCart.products = cart.products.map((product) => {
+      return {
+        price: product.price,
+        name: product.product_name_fr,
+        availableQuantity: Number(product.availableQuantity),
+      };
+    });
+    console.log('Returned cart : ' + JSON.stringify(returnedCart));
+    return returnedCart;
   }
   async getInfoProduct(productId: string): Promise<ProductInShop> {
     return await this.productService.findOne(productId);

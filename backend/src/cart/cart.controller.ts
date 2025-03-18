@@ -18,7 +18,11 @@ export class CartController {
   }
 
   @Get(':userId')
-  getCart(@Param('userId') userId: number) {
-    return this.cartService.getCart(userId);
+  async getCart(@Param('userId') userId: number) {
+    const cart = await this.cartService.getCart(userId);
+    if (cart === null) {
+      return { message: 'Cart is empty', products: [] };
+    }
+    return cart;
   }
 }
