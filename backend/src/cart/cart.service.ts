@@ -6,7 +6,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, Repository } from 'typeorm';
+import { Between, JsonContains, Repository } from 'typeorm';
 import { Product } from '../product/entities/product.entity';
 import { Order } from '../order/entities/order.entity';
 import { Orderline } from '../orderline/entities/orderline.entity';
@@ -20,6 +20,7 @@ import { ProductService } from '../product/product.service';
 import { ProductInShop } from '../product/dto/product-info.dto';
 import { CreateOrderlineDto } from '../orderline/dto/create-orderline.dto';
 import { KpiService } from '../kpi/kpi.service';
+import { BillingDetail } from 'src/billing-details/entities/billing-detail.entity';
 
 @Injectable()
 export class CartService {
@@ -40,6 +41,8 @@ export class CartService {
     private readonly productService: ProductService,
     @Inject(forwardRef(() => KpiService))
     private readonly kpiService: KpiService,
+    @InjectRepository(BillingDetail)
+    private readonly billingRepository: Repository<BillingDetail>,
   ) {}
 
   async newOrdelineByNewProduct(
@@ -75,8 +78,6 @@ export class CartService {
       throw new Error('Order not found');
     }
     const orderlineData: CreateOrderlineDto = {
-      productId: product.id,
-      orderId: order.id,
       price_at_order: price,
       quantity: 1,
     };
@@ -85,6 +86,10 @@ export class CartService {
     orderLine.product = product;
     orderLine.order = order;
     await this.orderlineRepository.save(orderLine);
+    console.log('tata: ' + JSON.stringify(JSON.stringify(order)));
+    order.user = await this.userRepository.findOne({
+      where: { id: order.user.id },
+    });
     await this.orderRepository.save(order);
     console.log(
       'Orderline created : ' +
@@ -115,19 +120,25 @@ export class CartService {
       total_price: 0,
       creation_date: new Date(),
       is_paid: false,
-      userId: userId,
     };
-    this.orderRepository.create(createOrderDto);
-    const order = await this.orderRepository.save(createOrderDto);
-
+    console.log('Creating order' + JSON.stringify(createOrderDto));
+    const order = await this.orderRepository.create(createOrderDto);
+    order.user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    order.billing = await this.billingRepository.findOne({
+      where: { id: 1 },
+    });
+    await this.orderRepository.save(order);
+    console.log('order created' + JSON.stringify(order));
     const price = inventory.price;
     const orderlineData = {
-      productId: product.id,
-      orderId: order.id,
       price_at_order: price,
       quantity: 1,
     };
     const orderLine = this.orderlineRepository.create(orderlineData);
+    orderLine.product = product;
+    orderLine.order = order;
     await this.orderlineRepository.save(orderLine);
     await this.updateOrderTotalPrice(order, orderlineData.price_at_order);
     await this.updateStock(productId, shopId, -orderLine.quantity);
@@ -187,6 +198,7 @@ export class CartService {
     const orderEntity = await this.orderRepository.findOne({
       where: { id: order.id },
     });
+    console.log('Order entity : ' + JSON.stringify(orderEntity));
     await this.orderRepository.save(orderEntity);
   }
   async addToCart(addProductDto: AddProductDto) {
@@ -201,6 +213,7 @@ export class CartService {
         where: { user: { id: addProductDto.userId }, is_paid: false },
         relations: ['orderlines'],
       });
+      console.log('User ' + JSON.stringify(addProductDto.userId));
       if (!order) {
         console.log('order doesnt exist');
         await this.newOrderByFirstProduct(
@@ -211,23 +224,20 @@ export class CartService {
       } else {
         console.log('order exists');
         console.log('Order 2: ' + JSON.stringify(order));
-
-        if (!product) {
-          throw new HttpException('Shop not found', HttpStatus.NOT_FOUND);
-        }
         if (order!.orderlines) {
+          console.log('Orderlines : ' + JSON.stringify(order!.orderlines));
+          console.log('Orderline : ' + JSON.stringify(order!.orderlines));
           const orderline = await this.orderlineRepository.findOne({
             where: {
-              order: { id: addProductDto.orderId },
-              product: { id: product.id },
+              order: { id: order.id },
+              product: { open_food_fact_id: product.open_food_fact_id },
             },
-            relations: ['product'],
           });
           if (!orderline) {
             console.log('No orderline');
             await this.newOrdelineByNewProduct(
               product.open_food_fact_id,
-              addProductDto.orderId,
+              order.id,
               addProductDto.shopId,
             );
             return true;

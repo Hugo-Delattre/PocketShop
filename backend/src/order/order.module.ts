@@ -11,9 +11,21 @@ import { InventoryService } from '../inventory/inventory.service';
 import { Inventory } from '../inventory/entities/inventory.entity';
 import { ShopService } from '../shop/shop.service';
 import { Shop } from '../shop/entities/shop.entity';
+import { Category } from '../product/entities/category.entity';
+import { OrderlineService } from 'src/orderline/orderline.service';
+import { Orderline } from 'src/orderline/entities/orderline.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Order, Product, Shop, Inventory])],
+  imports: [
+    TypeOrmModule.forFeature([
+      Order,
+      Product,
+      Shop,
+      Inventory,
+      Category,
+      Orderline,
+    ]),
+  ],
   controllers: [OrderController],
   providers: [
     OrderService,
@@ -22,6 +34,7 @@ import { Shop } from '../shop/entities/shop.entity';
     ProductService,
     ShopService,
     InventoryService,
+    OrderlineService,
   ],
 })
 export class OrderModule {}

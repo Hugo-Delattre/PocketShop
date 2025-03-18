@@ -8,6 +8,7 @@ export class CartController {
 
   @Patch('/add')
   addToCart(@Body() addProductDto: AddProductDto) {
+    console.log(addProductDto);
     return this.cartService.addToCart(addProductDto);
   }
 

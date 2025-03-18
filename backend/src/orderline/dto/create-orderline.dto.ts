@@ -11,14 +11,4 @@ export class CreateOrderlineDto {
   @IsNumber()
   @IsNotEmpty()
   price_at_order: number;
-
-  @ApiProperty()
-  @IsNumber()
-  @IsNotEmpty()
-  productId: number;
-
-  @ApiProperty()
-  @IsNumber()
-  @IsNotEmpty()
-  orderId: number;
 }

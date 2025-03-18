@@ -17,24 +17,18 @@ import { CartModule } from './cart/cart.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }), // Charge les variables d'env
-
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule], // Charge ConfigModule
-      useFactory: async (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get<string>('DB_HOST'),
-        port: configService.get<number>('DB_PORT'),
-        username: configService.get<string>('DB_USER'),
-        password: configService.get<string>('DB_PASSWORD'),
-        database: configService.get<string>('DB_NAME'),
-        ssl: { rejectUnauthorized: false },
-        autoLoadEntities: true,
-        synchronize: false, // Mets `true` en dev uniquement
-      }),
-      inject: [ConfigService], // Injecte ConfigService
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: 'db',
+      port: 5432,
+      username: 'postgres',
+      password: 'postgres',
+      database: 'postgres',
+      entities: [__dirname + '/**/*.entity.ts'],
+      synchronize: true, //TODO: Remember to remove this for production
+      autoLoadEntities: true,
     }),
-
+    ConfigModule.forRoot({ isGlobal: true }),
     UserModule,
     AuthModule,
     ProductModule,
@@ -44,7 +38,9 @@ import { CartModule } from './cart/cart.module';
     OrderlineModule,
     CartModule,
     BillingDetailsModule,
+    CartModule,
   ],
+
   controllers: [AppController],
   providers: [
     AppService,
