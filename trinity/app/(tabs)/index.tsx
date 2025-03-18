@@ -54,7 +54,9 @@ function index() {
         style={{ ...styles.card, ...styles.flex, alignItems: "center" }}
       >
         <Ionicons size={40} name="search" />
-        <Text style={styles.cardTitle}>Browse through all the products</Text>
+        <Text style={{ ...styles.cardTitle, flexShrink: 1 }}>
+          Browse through all the products
+        </Text>
       </TouchableOpacity>
     </View>
   );
