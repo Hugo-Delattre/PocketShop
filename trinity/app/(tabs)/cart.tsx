@@ -15,7 +15,7 @@ import { ScrollView } from "react-native";
 import Icon from "@rneui/themed/dist/Icon";
 import ProductCard from "@/components/custom/ProductCart";
 import { CartResponseDao } from "@/constants/interface/Cart";
-import { usePathname } from "expo-router";
+import { usePathname, useRouter } from "expo-router";
 import usePaypalApi from "@/hooks/api/paypal";
 import * as Linking from "expo-linking";
 import { getUserIdFromJwt } from "@/hooks/auth";
@@ -25,6 +25,7 @@ export default function Cart() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paypalUrl, setPaypalUrl] = useState<string | null>(null);
   const path = usePathname();
+  const router = useRouter();
   const { getCart, loading } = useCartApi();
   const [userId, setUserId] = useState<string | null>(null);
   const {
@@ -163,9 +164,12 @@ export default function Cart() {
           )}
           <TouchableOpacity
             style={styles.closeButton}
-            onPress={() => setShowPaymentModal(false)}
+            onPress={() => {
+              setShowPaymentModal(false);
+              router.push("/(tabs)");
+            }}
           >
-            <Text style={styles.closeButtonText}>Fermer</Text>
+            <Text style={styles.closeButtonText}>Close</Text>
           </TouchableOpacity>
         </SafeAreaView>
       </Modal>
