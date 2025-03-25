@@ -12,9 +12,10 @@ import useCartApi, { AddPayload, removePayload } from "@/hooks/api/cart";
 import React, { useEffect, useState } from "react";
 import { getUserIdFromJwt } from "@/hooks/auth";
 
-interface ProductCartProps {
+export interface ProductCartProps {
   productData: CartInfo;
   orderId: number;
+  onQuantityChange?: (updatedQuantity: number) => void;
 }
 const ProductCard = (props: ProductCartProps) => {
   console.log("PRODUCT IN CART", props.productData.code);
@@ -37,6 +38,7 @@ const ProductCard = (props: ProductCartProps) => {
     productId: Number(props.productData.product.id),
     orderId: Number(props.orderId),
     shopId: 1,
+    userId: Number(userId),
   };
   useEffect(() => {
     if (isEmpty) {
@@ -47,6 +49,7 @@ const ProductCard = (props: ProductCartProps) => {
   if (isEmpty) {
     return <></>;
   }
+
   return (
     <SafeAreaView>
       <View key={props.productData.product.id} style={styles.productCard}>
@@ -69,6 +72,7 @@ const ProductCard = (props: ProductCartProps) => {
                 style={styles.btnRemove}
                 onPress={() => {
                   props.productData.selectedQuantity--;
+                  props.onQuantityChange?.(props.productData.selectedQuantity);
                   console.log(
                     "selectedQuantity",
                     props.productData.selectedQuantity
@@ -89,6 +93,7 @@ const ProductCard = (props: ProductCartProps) => {
                 style={styles.btnAdd}
                 onPress={() => {
                   props.productData.selectedQuantity++;
+                  props.onQuantityChange?.(props.productData.selectedQuantity);
                   addToCart(addPayload);
                 }}
               >

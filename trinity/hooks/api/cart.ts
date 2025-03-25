@@ -11,6 +11,7 @@ export type AddPayload = {
 };
 
 export type removePayload = {
+  userId: number;
   productId: number;
   orderId: number;
   shopId: number;
@@ -63,7 +64,7 @@ const useCartApi = () => {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer" + token,
+          Authorization: "Bearer " + token,
         },
         body: JSON.stringify(body),
       });
