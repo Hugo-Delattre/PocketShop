@@ -97,7 +97,7 @@ export const useLogout = () => {
       const remainingToken = await AsyncStorage.getItem("jwt");
       if (remainingToken === null) {
         console.log("Utilisateur déconnecté avec succès");
-        router.replace("/login");
+        router.replace("/(auth)/login");
       } else {
         console.error("Échec de la déconnexion: le token est toujours présent");
         Alert.alert("Erreur", "Une erreur est survenue lors de la déconnexion");

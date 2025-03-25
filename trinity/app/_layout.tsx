@@ -4,9 +4,9 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Redirect, Stack } from "expo-router";
+import { Redirect, Stack, useNavigation } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import { ComponentType, useEffect } from "react";
 import "react-native-reanimated";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -28,18 +28,7 @@ SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
 
-function AuthenticationGuard({ children }: { children: React.ReactNode }) {
-  const { atomIsAuthenticated } = useAuth();
-  const isAuthenticated = useAtomValue(atomIsAuthenticated);
-  console.warn("atomIsAuthenticated:", atomIsAuthenticated);
-  console.warn("isAuthenticated:", isAuthenticated);
-  if (!atomIsAuthenticated) {
-    return <Redirect href="/(auth)/login" />;
-  }
-  return <>{children}</>;
-}
-
-export default function RootLayout() {
+function RootLayout() {
   const colorScheme = useColorScheme();
 
   const [loaded] = useFonts({
@@ -63,25 +52,22 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <AuthenticationGuard>
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="(auth)/login"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="profile"
-              options={{
-                title: "Mon Profil",
-                headerShown: true,
-              }}
-            />
-            <Stack.Screen name="+not-found" />
-          </Stack>
-          <PayPalRedirectHandler />
-        </AuthenticationGuard>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)/login" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="profile"
+            options={{
+              title: "Mon Profil",
+              headerShown: true,
+            }}
+          />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+        <PayPalRedirectHandler />
       </ThemeProvider>
     </QueryClientProvider>
   );
 }
+
+export default RootLayout;

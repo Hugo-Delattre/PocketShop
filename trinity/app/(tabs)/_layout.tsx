@@ -1,5 +1,5 @@
-import React from "react";
-import { Tabs, useRouter } from "expo-router";
+import React, { ComponentType } from "react";
+import { Redirect, Tabs, useRouter } from "expo-router";
 
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { Colors } from "@/constants/Colors";
@@ -7,10 +7,14 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { lightPrimary, primaryColor } from "@/utils/colors";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import useAuth, { useLogout, userAtom } from "@/hooks/auth";
+import { useAtomValue } from "jotai";
 
-export default function TabLayout() {
+function TabLayout() {
   const colorScheme = useColorScheme();
   const router = useRouter();
+  const user = useAtomValue(userAtom);
+  const logout = useLogout();
 
   return (
     <Tabs
@@ -28,12 +32,11 @@ export default function TabLayout() {
                 style={styles.profilePic}
                 onPress={() => router.push("/profile")}
               >
-                <Text style={{ ...styles.white, ...styles.bold }}>LL</Text>
+                <Text style={{ ...styles.white, ...styles.bold }}>
+                  {user && user.username[0]}
+                </Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.logoutIcon}
-                onPress={() => router.push("/(auth)/login")}
-              >
+              <TouchableOpacity style={styles.logoutIcon} onPress={logout}>
                 <Text style={{ ...styles.bold }}>
                   <MaterialCommunityIcons name="logout" size={24} />
                 </Text>
@@ -126,3 +129,21 @@ const styles = StyleSheet.create({
     height: 40,
   },
 });
+
+function withAuthentication<P extends object>(
+  WrappedComponent: ComponentType<P>
+) {
+  return function AuthenticatedComponent(props: P) {
+    const { atomIsAuthenticated } = useAuth();
+    const isAuthenticated = useAtomValue(atomIsAuthenticated);
+
+    if (!isAuthenticated) {
+      return <Redirect href={"/(auth)/login"} />;
+    }
+
+    // Render the wrapped component with its original props
+    return <WrappedComponent {...props} />;
+  };
+}
+
+export default withAuthentication(TabLayout);

@@ -89,16 +89,13 @@ function profileView() {
               <Icon name="edit" size={18} style={{ marginLeft: sizes.xs }} />
             </Button>
 
-            <Button
-              onPress={logout}
-              buttonStyle={{
-                width: 120,
-              }}
-              radius="md"
-              type="outline"
-            >
+            <Button onPress={logout} radius="md" type="outline">
               <Text style={styles.logoutText}>Déconnexion</Text>
-              <MaterialCommunityIcons name="logout" size={24} />
+              <MaterialCommunityIcons
+                name="logout"
+                size={18}
+                style={{ marginLeft: sizes.xs }}
+              />
             </Button>
           </View>
         </>
