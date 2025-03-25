@@ -21,7 +21,7 @@ export default function App() {
   const [isFocused, setIsFocused] = useState(true);
   const pathname = usePathname();
   useEffect(() => {
-    setIsFocused(pathname === "/");
+    setIsFocused(pathname === "/scan");
   }, [pathname]);
 
   useEffect(() => {

@@ -18,6 +18,7 @@ import { CartResponseDao } from "@/constants/interface/Cart";
 import { usePathname } from "expo-router";
 import usePaypalApi from "@/hooks/api/paypal";
 import * as Linking from "expo-linking";
+import { getUserIdFromJwt } from "@/hooks/auth";
 
 export default function Cart() {
   const [cart, setCart] = useState<CartResponseDao>();
@@ -25,6 +26,7 @@ export default function Cart() {
   const [paypalUrl, setPaypalUrl] = useState<string | null>(null);
   const path = usePathname();
   const { getCart, loading } = useCartApi();
+  const [userId, setUserId] = useState<string | null>(null);
   const {
     initiatePaypalPayment,
     loading: isPaypalLoading,
@@ -34,7 +36,9 @@ export default function Cart() {
   useEffect(() => {
     const fetchCart = async () => {
       console.log("starting getCart");
-      const cart = await getCart(52);
+      const userId = await getUserIdFromJwt();
+      setUserId(userId?.toString() || null);
+      const cart = await getCart(userId || 1);
       console.log("getCart answer:", JSON.stringify(cart, null, 2));
       if (!cart) return;
       setCart(cart);
@@ -45,7 +49,7 @@ export default function Cart() {
   const handlePaypalPayment = async () => {
     console.log("handlePaypalPayment");
     try {
-      const paypalResponse = await initiatePaypalPayment(109); //We will have to use order.id instead, for now i've just used an hardcoded value
+      const paypalResponse = await initiatePaypalPayment(cart?.orderId || 0);
       if (paypalResponse?.paypalUrl) {
         console.log("Redirection vers PayPal :", paypalResponse.paypalUrl);
         setPaypalUrl(paypalResponse.paypalUrl);
@@ -82,7 +86,9 @@ export default function Cart() {
             {cart?.products?.length} differents products for{" "}
           </Text>
           <Text style={styles.headerPrice}>
-            <Text style={styles.totalPrice}>{cart?.totalPrice} €</Text>
+            <Text style={styles.totalPrice}>
+              {Number(cart?.totalPrice).toFixed(2)} €
+            </Text>
           </Text>
         </View>
       </View>
@@ -97,6 +103,25 @@ export default function Cart() {
                   key={product.code}
                   productData={product}
                   orderId={cart.orderId}
+                  onQuantityChange={(updatedQuantity: number) => {
+                    const updatedCart = { ...cart };
+                    const productIndex = updatedCart.products.findIndex(
+                      (p) => p.code === product.code
+                    );
+                    if (productIndex !== -1) {
+                      updatedCart.products[productIndex].selectedQuantity =
+                        updatedQuantity;
+                      updatedCart.totalPrice = updatedCart.products
+                        .reduce(
+                          (total, p) =>
+                            total +
+                            Number(p.price) * Number(p.selectedQuantity),
+                          0
+                        )
+                        .toString();
+                      setCart(updatedCart);
+                    }
+                  }}
                 />
               );
             })
@@ -106,7 +131,9 @@ export default function Cart() {
         </ScrollView>
       </View>
       <View style={styles.payArea}>
-        <Text style={styles.checkoutText}>Checkout {cart?.totalPrice}</Text>
+        <Text style={styles.checkoutText}>
+          Checkout {Number(cart?.totalPrice).toFixed(2)} €
+        </Text>
         <TouchableOpacity
           style={styles.paypal}
           onPress={() => {
