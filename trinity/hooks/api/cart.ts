@@ -22,7 +22,7 @@ const useCartApi = () => {
 
   const addToCart = async (body: AddPayload): Promise<boolean> => {
     setLoading(true);
-
+    console.log("addToCart body:", body);
     try {
       const token = await getJwtFromStorage();
 
@@ -35,7 +35,7 @@ const useCartApi = () => {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(body),
       });
@@ -135,7 +135,7 @@ const useCartApi = () => {
         },
       });
       if (!response.ok) {
-        console.error("Error while fetching cart" + response);
+        console.error("Error while fetching cart" + JSON.stringify(response));
       }
       const result = await response.json();
       return result.total_price;

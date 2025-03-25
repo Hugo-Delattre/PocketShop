@@ -36,7 +36,14 @@ const useProductApi = () => {
     }
   };
   const getProduct = async (id: string): Promise<ProductInShop | null> => {
-    setJwtToken(jwtToken);
+    let tokenToUse = jwtToken;
+    if (!jwtToken) {
+      const token = await getJwtFromStorage();
+      setJwtToken(token);
+      tokenToUse = token;
+      console.log("Retrieved token:", token);
+    }
+    console.log("Using token:", tokenToUse);
     setLoading(true);
 
     console.log("BASE_URL", BASE_URL);
@@ -45,13 +52,13 @@ const useProductApi = () => {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer " + jwtToken,
+          Authorization: "Bearer " + tokenToUse,
         },
       });
-      console.log("jwt in request", jwtToken);
+      console.log("jwt in request", tokenToUse);
       if (!response.ok) {
         console.log("response", response);
-        throw new Error("Product not found");
+        throw new Error("Product not found" + response.statusText);
       }
       const result = await response.json();
       // console.log("result", result.code);

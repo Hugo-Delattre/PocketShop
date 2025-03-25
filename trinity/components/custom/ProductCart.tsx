@@ -9,7 +9,8 @@ import {
 import { ThemedText } from "../ThemedText";
 import { CartInfo } from "@/constants/interface/Cart";
 import useCartApi, { AddPayload, removePayload } from "@/hooks/api/cart";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { getUserIdFromJwt } from "@/hooks/auth";
 
 interface ProductCartProps {
   productData: CartInfo;
@@ -18,16 +19,34 @@ interface ProductCartProps {
 const ProductCard = (props: ProductCartProps) => {
   console.log("PRODUCT IN CART", props.productData.code);
   const { addToCart, removeFromCart } = useCartApi();
+  const [userId, setUserId] = useState("1");
+  const [isEmpty, setIsEmpty] = useState(false);
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const userId = await getUserIdFromJwt();
+      setUserId(userId?.toString() || "1");
+    };
+    fetchUserId();
+  }, []);
   const addPayload: AddPayload = {
     productId: props.productData.code,
     shopId: "1",
-    userId: "1",
+    userId: userId,
   };
   const removePayload: removePayload = {
     productId: Number(props.productData.product.id),
     orderId: Number(props.orderId),
-    shopId: 1, //TODO
+    shopId: 1,
   };
+  useEffect(() => {
+    if (isEmpty) {
+      console.log("Cart is empty, returning empty component");
+    }
+  }, [isEmpty]);
+
+  if (isEmpty) {
+    return <></>;
+  }
   return (
     <SafeAreaView>
       <View key={props.productData.product.id} style={styles.productCard}>
@@ -48,7 +67,18 @@ const ProductCard = (props: ProductCartProps) => {
             <View style={styles.quantity}>
               <TouchableOpacity
                 style={styles.btnRemove}
-                onPress={() => removeFromCart(removePayload)}
+                onPress={() => {
+                  props.productData.selectedQuantity--;
+                  console.log(
+                    "selectedQuantity",
+                    props.productData.selectedQuantity
+                  );
+                  if (props.productData.selectedQuantity === 0) {
+                    setIsEmpty(true);
+                    console.log("isEmpty", isEmpty);
+                  }
+                  removeFromCart(removePayload);
+                }}
               >
                 <Icon name={"remove"} size={15} color="white" />
               </TouchableOpacity>
@@ -57,7 +87,10 @@ const ProductCard = (props: ProductCartProps) => {
               </ThemedText>
               <TouchableOpacity
                 style={styles.btnAdd}
-                onPress={() => addToCart(addPayload)}
+                onPress={() => {
+                  props.productData.selectedQuantity++;
+                  addToCart(addPayload);
+                }}
               >
                 <Icon name={"add"} size={15} color="white" />
               </TouchableOpacity>

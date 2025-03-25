@@ -123,6 +123,7 @@ export async function getUserIdFromJwt(): Promise<number | null> {
       await removeJwtFromStorage();
       return null;
     }
+    console.log("ID utilisateur:", decodedToken.sub);
     return decodedToken.sub;
   } catch (error) {
     console.error("Erreur lors de la récupération de l'ID utilisateur:", error);
