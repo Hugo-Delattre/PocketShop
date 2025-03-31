@@ -51,7 +51,6 @@ function profileView() {
   }
 
   if (!data || error) {
-    console.error("Error when fetching profile", error);
     return <Text>An error occured</Text>;
   }
   const initials = `${data.first_name?.[0].toUpperCase()} ${data.last_name?.[0].toUpperCase()}`;

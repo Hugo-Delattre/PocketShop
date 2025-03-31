@@ -34,13 +34,11 @@ export async function getUserTokenFromStorage() {
   try {
     const jwt = await AsyncStorage.getItem("jwt");
     if (!jwt) {
-      console.error("No token found");
       return null;
     }
     const decodedToken: JWT_User = jwtDecode(jwt);
     return decodedToken;
   } catch (error) {
-    console.error("Error getting user token:", error);
     return null;
   }
 }
@@ -56,7 +54,6 @@ export const getJwtFromStorage = async (): Promise<string | null> => {
     const token = await AsyncStorage.getItem("jwt");
     return token;
   } catch (error) {
-    console.error("Erreur lors de la récupération du JWT:", error);
     return null;
   }
 };
@@ -76,7 +73,6 @@ async function fetchJwtToken(creds: creds): Promise<string> {
     body: JSON.stringify(creds),
   });
   if (!response.ok) {
-    console.error("response", response);
     throw new Error("Login failed" + JSON.stringify(response));
   }
   const data = await response.json();
@@ -99,11 +95,9 @@ export const useLogout = () => {
         console.log("Utilisateur déconnecté avec succès");
         router.replace("/(auth)/login");
       } else {
-        console.error("Échec de la déconnexion: le token est toujours présent");
         Alert.alert("Erreur", "Une erreur est survenue lors de la déconnexion");
       }
     } catch (error) {
-      console.error("Erreur lors de la déconnexion:", error);
       Alert.alert("Erreur", "Une erreur est survenue lors de la déconnexion");
     }
   };
@@ -126,7 +120,6 @@ export async function getUserIdFromJwt(): Promise<number | null> {
     console.log("ID utilisateur:", decodedToken.sub);
     return decodedToken.sub;
   } catch (error) {
-    console.error("Erreur lors de la récupération de l'ID utilisateur:", error);
     return null;
   }
 }

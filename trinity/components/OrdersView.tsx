@@ -24,7 +24,6 @@ export function OrdersView() {
   }
 
   if (error) {
-    console.error(error);
     return <Text>An error occured</Text>;
   }
 

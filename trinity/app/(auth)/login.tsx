@@ -32,7 +32,6 @@ export default function Login() {
       const user: JWT_User = jwtDecode(jwt);
       setUser(user);
     } catch (err) {
-      console.error("Login error:", err);
       setError("Invalid username or password");
     } finally {
       setIsLoading(false);

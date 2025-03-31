@@ -43,7 +43,7 @@ export default function PayPalRedirectHandler() {
       //     // navigation.navigate("PaymentError", { error: "Erreur de paiement" });
       //   }
       // } catch (error) {
-      //   console.error("Erreur lors de la capture du paiement:", error);
+      //
       //   // navigation.navigate("PaymentError", { error: error.message });
       // }
     };

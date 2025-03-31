@@ -83,7 +83,7 @@ const useCartApi = () => {
       console.log(`GET ${BASE_URL}/${userId}`);
       const token = await getJwtFromStorage();
       if (!token) {
-        throw new Error("No JWT token found");
+        setError(new Error("No JWT token found"));
       }
       const response = await fetch(`${BASE_URL}/${userId}`, {
         method: "GET",
@@ -95,8 +95,13 @@ const useCartApi = () => {
       console.log("getCart JWT", `Bearer ${token}`);
 
       if (!response.ok) {
-        console.error("Error while fetching cart:", response.status);
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        if (response.status === 401) {
+          setError(new Error("Session invalide veuillez vous reconnecter"));
+        } else if (response.status === 404) {
+          setError(new Error(`Panier vide pour votre utilisateur`));
+        } else if (response.status === 500) {
+          setError(new Error("Erreur inatendu, veuillez réessayer"));
+        }
       }
       const result = await response.json();
       console.log(
@@ -106,13 +111,13 @@ const useCartApi = () => {
       if (!result.products) {
         console.warn("products undefined");
         result.products = [];
+      } else {
+        const price = await getTotalPriceByCart(result.orderId);
+        setError(null);
+        result.totalPrice = price;
+        return result;
       }
-
-      const price = await getTotalPriceByCart(result.orderId);
-      result.totalPrice = price;
-      return result;
     } catch (err) {
-      console.error("getCart error:", err);
       setError(err as Error);
       throw err;
     } finally {
@@ -136,7 +141,6 @@ const useCartApi = () => {
         },
       });
       if (!response.ok) {
-        console.error("Error while fetching cart" + JSON.stringify(response));
       }
       const result = await response.json();
       return result.total_price;

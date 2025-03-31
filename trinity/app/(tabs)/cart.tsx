@@ -26,7 +26,7 @@ export default function Cart() {
   const [paypalUrl, setPaypalUrl] = useState<string | null>(null);
   const path = usePathname();
   const router = useRouter();
-  const { getCart, loading } = useCartApi();
+  const { getCart, loading, error: cartError } = useCartApi();
   const [userId, setUserId] = useState<string | null>(null);
   const {
     initiatePaypalPayment,
@@ -36,12 +36,18 @@ export default function Cart() {
 
   useEffect(() => {
     const fetchCart = async () => {
-      console.log("starting getCart");
       const userId = await getUserIdFromJwt();
       setUserId(userId?.toString() || null);
       const cart = await getCart(userId || 1);
-      console.log("getCart answer:", JSON.stringify(cart, null, 2));
-      if (!cart) return;
+      if (!cart) {
+        setCart({
+          orderId: 0,
+          products: [],
+          totalPrice: "0",
+          userId: userId ? userId : 0,
+        });
+        return;
+      }
       setCart(cart);
     };
     fetchCart();
@@ -56,9 +62,7 @@ export default function Cart() {
         setPaypalUrl(paypalResponse.paypalUrl);
         setShowPaymentModal(true);
       }
-    } catch (err) {
-      console.error("Erreur lors du paiement PayPal :", err);
-    }
+    } catch (err) {}
   };
 
   const handleNavigationStateChange = (navState: { url: string }) => {
@@ -75,6 +79,28 @@ export default function Cart() {
     }
   };
 
+  if (cartError || error) {
+    const errorMessage = error?.message || cartError?.message;
+    return (
+      <SafeAreaView style={styles.container}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            padding: 20,
+          }}
+        >
+          <Text
+            style={[{ textAlign: "center", color: "red", marginBottom: 10 }]}
+          >
+            Une erreur est survenue :
+          </Text>
+          <Text style={{ textAlign: "center" }}>{errorMessage}</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
   return (
     <SafeAreaView>
       <View style={styles.container}>
@@ -88,7 +114,7 @@ export default function Cart() {
           </Text>
           <Text style={styles.headerPrice}>
             <Text style={styles.totalPrice}>
-              {Number(cart?.totalPrice).toFixed(2)} €
+              {Number(cart?.totalPrice || 0).toFixed(2)} €
             </Text>
           </Text>
         </View>
@@ -133,7 +159,7 @@ export default function Cart() {
       </View>
       <View style={styles.payArea}>
         <Text style={styles.checkoutText}>
-          Checkout {Number(cart?.totalPrice).toFixed(2)} €
+          Checkout {Number(cart?.totalPrice || 0).toFixed(2)} €
         </Text>
         <TouchableOpacity
           style={styles.paypal}

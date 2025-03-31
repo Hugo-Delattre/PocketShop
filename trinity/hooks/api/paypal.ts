@@ -19,7 +19,6 @@ export const usePaypalApi = () => {
     setLoading(true);
     const token = await getJwtFromStorage();
     if (!token) {
-      console.error("JWT missing for PayPal payment");
       throw new Error("Authentication required");
     }
 

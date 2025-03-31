@@ -45,7 +45,6 @@ export async function saveFile({
     }
     throw new Error("Partage non disponible sur cet appareil");
   } catch (error) {
-    console.error(error);
     return {
       success: false,
       message: error as string,

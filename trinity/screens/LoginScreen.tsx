@@ -22,7 +22,7 @@ export default function LoginScreen() {
         setUser(user);
       })
 
-      .catch((err) => console.error(err));
+      .catch((err) => console.log(err));
   };
 
   return (

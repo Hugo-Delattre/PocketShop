@@ -43,7 +43,7 @@ function index() {
           <MaterialCommunityIcons size={40} name="arrow-top-right" />
         </View>
         <Text style={{ color: "#585858" }}>
-          6 products are currently in your cart
+          See products that are currently in your cart
         </Text>
       </TouchableOpacity>
       <Text style={{ ...styles.h1, marginTop: sizes.md }}>
@@ -55,7 +55,7 @@ function index() {
       >
         <Ionicons size={40} name="search" />
         <Text style={{ ...styles.cardTitle, flexShrink: 1 }}>
-          Browse through all the products
+          Search for products
         </Text>
       </TouchableOpacity>
     </View>

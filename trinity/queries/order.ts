@@ -34,4 +34,4 @@ export const getOrders = async () => {
     method: "GET",
     url: `/invoices`,
   });
-}
+};
