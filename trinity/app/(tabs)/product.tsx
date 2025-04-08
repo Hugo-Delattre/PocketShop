@@ -28,13 +28,15 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { ScrollView } from "react-native";
 import useCartApi from "@/hooks/api/cart";
 import React from "react";
+import { getUserIdFromJwt } from "@/hooks/auth";
+import { set } from "react-hook-form";
 export default function ProductScreen() {
   const router = useRouter();
   const { addToCart, removeFromCart } = useCartApi();
   const params = useLocalSearchParams();
-  const { getProduct, loading } = useProductApi();
+  const { getProduct, loading, error } = useProductApi();
   const [productInShop, setProductShop] = useState<ProductInShop | null>(null);
-
+  const [userId, setUserId] = useState<string | null>(null);
   // from string | string[] to string
   const productId = Array.isArray(params?.productId)
     ? params.productId[0]
@@ -42,8 +44,8 @@ export default function ProductScreen() {
   useEffect(() => {
     const fetchProduct = async () => {
       const productData = await getProduct(productId);
-      console.log("Product Data", productData);
-
+      const userId = await getUserIdFromJwt();
+      setUserId(userId?.toString() || null);
       if (productData) {
         setProductShop(productData);
       }
@@ -52,6 +54,32 @@ export default function ProductScreen() {
     fetchProduct();
   }, [productId]);
 
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            padding: 20,
+          }}
+        >
+          <Text
+            style={[
+              styles.message,
+              { textAlign: "center", color: "red", marginBottom: 10 },
+            ]}
+          >
+            Une erreur est survenue :
+          </Text>
+          <Text style={[styles.message, { textAlign: "center" }]}>
+            {error.message}
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
   if (loading || !productInShop) {
     return (
       <SafeAreaView style={styles.container}>
@@ -59,10 +87,6 @@ export default function ProductScreen() {
       </SafeAreaView>
     );
   }
-
-  // FOR TESTING PURPOSE
-
-  //END TEST
   return (
     <SafeAreaView>
       <View style={styles.container}>
@@ -116,7 +140,9 @@ export default function ProductScreen() {
               }}
             >
               <Text>Calories for 100g</Text>
-              <Text style={{ fontWeight: "bold" }}>160</Text>
+              <Text style={{ fontWeight: "bold" }}>
+                {productInShop.product.nutriments?.["energy-kcal"]} kcal
+              </Text>
             </View>
           </View>
           <CardDivider />
@@ -148,12 +174,12 @@ export default function ProductScreen() {
             console.log("Adding to cart", {
               productId: productInShop.code,
               shopId: "1",
-              userId: "1",
+              userId: userId,
             });
             addToCart({
               productId: productInShop.code,
               shopId: "1",
-              userId: "1",
+              userId: userId?.toString() || "1",
             });
           }}
           radius={5}

@@ -4,22 +4,39 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Redirect, Stack, useNavigation } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import { ComponentType, useEffect } from "react";
 import "react-native-reanimated";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { ImageBackground } from "react-native";
 import React from "react";
+import useAuth from "../hooks/auth";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  Karla_400Regular,
+  Karla_500Medium,
+  Karla_600SemiBold,
+  Karla_700Bold,
+} from "@expo-google-fonts/karla";
+import { CrimsonText_400Regular } from "@expo-google-fonts/crimson-text";
+import { Text } from "react-native";
+import PayPalRedirectHandler from "@/components/PaypalRedirectHandler";
+import { useAtomValue } from "jotai";
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+const queryClient = new QueryClient();
+
+function RootLayout() {
   const colorScheme = useColorScheme();
+
   const [loaded] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    Karla_400Regular,
+    Karla_600SemiBold,
+    Karla_500Medium,
+    Karla_700Bold,
+    CrimsonText_400Regular,
   });
 
   useEffect(() => {
@@ -29,15 +46,28 @@ export default function RootLayout() {
   }, [loaded]);
 
   if (!loaded) {
-    return null;
+    return <Text>Loading...</Text>;
   }
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)/login" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="profile"
+            options={{
+              title: "Mon Profil",
+              headerShown: true,
+            }}
+          />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+        <PayPalRedirectHandler />
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }
+
+export default RootLayout;

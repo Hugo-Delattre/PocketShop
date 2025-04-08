@@ -1,6 +1,7 @@
 import { useState } from "react";
-import getJwt from "@/utils/utils";
 import { CartResponseDao } from "@/constants/interface/Cart";
+import { getJwtFromStorage } from "@/hooks/auth";
+
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL + "/carts";
 const INVOICE_URL = process.env.EXPO_PUBLIC_API_URL + "/invoices";
 export type AddPayload = {
@@ -10,6 +11,7 @@ export type AddPayload = {
 };
 
 export type removePayload = {
+  userId: number;
   productId: number;
   orderId: number;
   shopId: number;
@@ -18,22 +20,27 @@ export type removePayload = {
 const useCartApi = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
-  const [jwtToken, setJwtToken] = useState<string | null>(null);
+
   const addToCart = async (body: AddPayload): Promise<boolean> => {
     setLoading(true);
-    const jwtToken = await getJwt();
-    setJwtToken(jwtToken);
-    // console.log("COUCOU", jwtToken);
+    console.log("addToCart body:", body);
     try {
+      const token = await getJwtFromStorage();
+
+      if (!token) {
+        throw new Error("No JWT token found");
+      }
+      console.log("addToCart JWT:", token);
+
       const response = await fetch(`${BASE_URL}/add`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer " + jwtToken,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(body),
       });
-      // console.log("response", response);
+
       return response.ok;
     } catch (err) {
       setError(err as Error);
@@ -45,14 +52,19 @@ const useCartApi = () => {
 
   const removeFromCart = async (body: removePayload): Promise<boolean> => {
     setLoading(true);
-    const jwtToken = await getJwt();
-    setJwtToken(jwtToken);
     try {
+      const token = await getJwtFromStorage();
+
+      if (!token) {
+        throw new Error("No JWT token found");
+      }
+
+      console.log("removeFromCart JWT:", token);
       const response = await fetch(`${BASE_URL}/remove`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer " + jwtToken,
+          Authorization: "Bearer " + token,
         },
         body: JSON.stringify(body),
       });
@@ -64,25 +76,47 @@ const useCartApi = () => {
       setLoading(false);
     }
   };
+
   const getCart = async (userId: number): Promise<CartResponseDao> => {
     setLoading(true);
-    const jwtToken = await getJwt();
-    setJwtToken(jwtToken);
     try {
+      console.log(`GET ${BASE_URL}/${userId}`);
+      const token = await getJwtFromStorage();
+      if (!token) {
+        setError(new Error("No JWT token found"));
+      }
       const response = await fetch(`${BASE_URL}/${userId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer " + jwtToken,
+          Authorization: `Bearer ${token}`,
         },
       });
+      console.log("getCart JWT", `Bearer ${token}`);
+
       if (!response.ok) {
-        console.error("Error while fetching cart" + response);
+        if (response.status === 401) {
+          setError(new Error("Session invalide veuillez vous reconnecter"));
+        } else if (response.status === 404) {
+          setError(new Error(`Panier vide pour votre utilisateur`));
+        } else if (response.status === 500) {
+          setError(new Error("Erreur inatendu, veuillez réessayer"));
+        }
       }
       const result = await response.json();
-      const price = getTotalPriceByCart(result.orderId);
-      result.totalPrice = price;
-      return result;
+      console.log(
+        `getCart userId: ${result.userId}, getCard orderId: ${result.orderId}`
+      );
+
+      if (!result.products) {
+        console.warn("products undefined");
+        result.products = [];
+      } else {
+        const price = await getTotalPriceByCart(result.orderId);
+        setError(null);
+        result.totalPrice = price;
+        return result;
+      }
     } catch (err) {
       setError(err as Error);
       throw err;
@@ -92,18 +126,21 @@ const useCartApi = () => {
   };
   const getTotalPriceByCart = async (orderId: number): Promise<Number> => {
     setLoading(true);
-    const jwtToken = await getJwt();
-    setJwtToken(jwtToken);
     try {
+      const token = await getJwtFromStorage();
+      if (!token) {
+        throw new Error("No JWT token found");
+      }
+      console.log("getTotalPriceByCart JWT:", token);
+
       const response = await fetch(`${INVOICE_URL}/${orderId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer " + jwtToken,
+          Authorization: `Bearer ${token}`,
         },
       });
       if (!response.ok) {
-        console.error("Error while fetching cart" + response);
       }
       const result = await response.json();
       return result.total_price;
@@ -113,7 +150,7 @@ const useCartApi = () => {
     } finally {
       setLoading(false);
     }
-  }
+  };
   return { loading, error, addToCart, getCart, removeFromCart };
 };
 export default useCartApi;

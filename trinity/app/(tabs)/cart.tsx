@@ -1,33 +1,106 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { WebView } from "react-native-webview";
 import {
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
   SafeAreaView,
+  Modal,
 } from "react-native";
 import { ProductInShop } from "@/constants/interface/Product";
-import React, { useState, useEffect, Fragment } from "react";
+import React, { useState, useEffect } from "react";
 import useCartApi from "@/hooks/api/cart";
 import { ScrollView } from "react-native";
 import Icon from "@rneui/themed/dist/Icon";
 import ProductCard from "@/components/custom/ProductCart";
 import { CartResponseDao } from "@/constants/interface/Cart";
-import { usePathname } from "expo-router";
+import { usePathname, useRouter } from "expo-router";
+import usePaypalApi from "@/hooks/api/paypal";
+import * as Linking from "expo-linking";
+import { getUserIdFromJwt } from "@/hooks/auth";
+
 export default function Cart() {
   const [cart, setCart] = useState<CartResponseDao>();
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paypalUrl, setPaypalUrl] = useState<string | null>(null);
   const path = usePathname();
-  const { getCart, loading } = useCartApi();
+  const router = useRouter();
+  const { getCart, loading, error: cartError } = useCartApi();
+  const [userId, setUserId] = useState<string | null>(null);
+  const {
+    initiatePaypalPayment,
+    loading: isPaypalLoading,
+    error,
+  } = usePaypalApi();
+
   useEffect(() => {
     const fetchCart = async () => {
-      const cart = await getCart(1);
+      const userId = await getUserIdFromJwt();
+      setUserId(userId?.toString() || null);
+      const cart = await getCart(userId || 1);
       if (!cart) {
+        setCart({
+          orderId: 0,
+          products: [],
+          totalPrice: "0",
+          userId: userId ? userId : 0,
+        });
         return;
       }
       setCart(cart);
     };
     fetchCart();
   }, [path]);
+
+  const handlePaypalPayment = async () => {
+    console.log("handlePaypalPayment");
+    try {
+      const paypalResponse = await initiatePaypalPayment(cart?.orderId || 0);
+      if (paypalResponse?.paypalUrl) {
+        console.log("Redirection vers PayPal :", paypalResponse.paypalUrl);
+        setPaypalUrl(paypalResponse.paypalUrl);
+        setShowPaymentModal(true);
+      }
+    } catch (err) {}
+  };
+
+  const handleNavigationStateChange = (navState: { url: string }) => {
+    const { url } = navState;
+    console.log("URL détectée :", url);
+    if (url.startsWith("trinity://payment-success")) {
+      console.log("Paiement réussi");
+      setShowPaymentModal(false);
+      //TODO: Success logic
+    } else if (url.startsWith("trinity://payment-cancel")) {
+      console.log("Paiement annulé !");
+      setShowPaymentModal(false);
+      //TODO: Cancel logic
+    }
+  };
+
+  if (cartError || error) {
+    const errorMessage = error?.message || cartError?.message;
+    return (
+      <SafeAreaView style={styles.container}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            padding: 20,
+          }}
+        >
+          <Text
+            style={[{ textAlign: "center", color: "red", marginBottom: 10 }]}
+          >
+            Une erreur est survenue :
+          </Text>
+          <Text style={{ textAlign: "center" }}>{errorMessage}</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
   return (
     <SafeAreaView>
       <View style={styles.container}>
@@ -37,40 +110,95 @@ export default function Cart() {
           /> */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>
-            {cart?.products.length} differents products for{" "}
+            {cart?.products?.length} differents products for{" "}
           </Text>
           <Text style={styles.headerPrice}>
-            <Text style={styles.totalPrice}>{cart?.totalPrice} €</Text>
+            <Text style={styles.totalPrice}>
+              {Number(cart?.totalPrice || 0).toFixed(2)} €
+            </Text>
           </Text>
         </View>
       </View>
       <View style={styles.productCardContainer}>
         <ScrollView style={styles.scrollArea}>
           {loading ? (
-            <Fragment>loading..</Fragment>
-          ) : (
-            cart?.products.map((product) => {
+            <Text>loading..</Text>
+          ) : cart?.products ? (
+            cart.products.map((product) => {
               return (
                 <ProductCard
                   key={product.code}
                   productData={product}
                   orderId={cart.orderId}
+                  onQuantityChange={(updatedQuantity: number) => {
+                    const updatedCart = { ...cart };
+                    const productIndex = updatedCart.products.findIndex(
+                      (p) => p.code === product.code
+                    );
+                    if (productIndex !== -1) {
+                      updatedCart.products[productIndex].selectedQuantity =
+                        updatedQuantity;
+                      updatedCart.totalPrice = updatedCart.products
+                        .reduce(
+                          (total, p) =>
+                            total +
+                            Number(p.price) * Number(p.selectedQuantity),
+                          0
+                        )
+                        .toString();
+                      setCart(updatedCart);
+                    }
+                  }}
                 />
               );
             })
+          ) : (
+            <Text>No products in cart</Text>
           )}
         </ScrollView>
       </View>
       <View style={styles.payArea}>
-        <Text style={styles.checkoutText}>Checkout {cart?.totalPrice}</Text>
+        <Text style={styles.checkoutText}>
+          Checkout {Number(cart?.totalPrice || 0).toFixed(2)} €
+        </Text>
         <TouchableOpacity
           style={styles.paypal}
-          onPress={() => console.log("remove")}
+          onPress={() => {
+            handlePaypalPayment();
+            console.log("pay clicked");
+          }}
         >
           <Icon name={"paypal"} size={25} color="white" />
-          <Text style={styles.payText}>Pay now</Text>
+          <Text style={styles.payText}>
+            {isPaypalLoading ? "Chargement..." : "Pay now"}
+          </Text>
         </TouchableOpacity>
       </View>
+
+      <Modal
+        visible={showPaymentModal}
+        animationType="slide"
+        onRequestClose={() => setShowPaymentModal(false)}
+      >
+        <SafeAreaView style={{ flex: 1 }}>
+          {paypalUrl && (
+            <WebView
+              source={{ uri: paypalUrl }}
+              onNavigationStateChange={handleNavigationStateChange}
+              style={{ flex: 1 }}
+            />
+          )}
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => {
+              setShowPaymentModal(false);
+              router.push("/(tabs)");
+            }}
+          >
+            <Text style={styles.closeButtonText}>Close</Text>
+          </TouchableOpacity>
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -212,5 +340,14 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 10,
+  },
+  closeButton: {
+    padding: 10,
+    backgroundColor: "#0079C1",
+    alignItems: "center",
+  },
+  closeButtonText: {
+    color: "white",
+    fontSize: 16,
   },
 });
