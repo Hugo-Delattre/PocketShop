@@ -80,25 +80,4 @@ describe('ProductService', () => {
       expect(await service.findAll(10, 0)).toEqual([[mockProduct], 10]);
     });
   });
-
-  //   describe('findOne', () => {
-  //     it('should return a single product with OpenFoodFacts data', async () => {
-  //       const expectedProduct = {
-  //         open_food_fact_id: mockProduct.open_food_fact_id,
-  //         shopId: mockProduct.shopId,
-  //         ...mockOpenFoodFactsResponse.product,
-  //       };
-
-  //       const result = await service.findOne(1);
-  //       expect(result).toEqual(expectedProduct);
-  //       expect(fetch).toHaveBeenCalledWith(
-  //         `https://world.openfoodfacts.org/api/v2/product/${mockProduct.open_food_fact_id}`,
-  //       );
-  //     });
-
-  //     it('should throw error when product not found', async () => {
-  //       mockProductRepository.findOne.mockResolvedValueOnce(null);
-  //       await expect(service.findOne(999)).rejects.toThrow(HttpException);
-  //     });
-  //   });
 });
